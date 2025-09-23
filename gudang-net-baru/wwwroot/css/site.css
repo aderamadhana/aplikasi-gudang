@@ -1,0 +1,480 @@
+﻿:root {
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --text: #0f172a;
+    --brand: #111827;
+    --shadow: 0 6px 24px rgba(16,24,40,.06), 0 2px 8px rgba(16,24,40,.04);
+    --submenu-max: 500px;
+    --active-bg: #1118270d;
+    --active-fg: #111827;
+    --content-top-extra: 20px; /* turunin konten dari header */
+    --content-right-extra: 56px;
+    /* NEW: ukuran header & sidebar (desktop) */
+    --header-h: 56px;
+    --sidebar-w: 270px;
+    --dt-bg: #fff;
+    --dt-head-bg: #0f3555; /* ganti sesuai brand */
+    --dt-head-text: #fff;
+    --dt-row-alt: #f8fafc;
+    --dt-border: #e9eef5;
+    --dt-active: #2563eb;
+    --dt-active-2: #0ea5e9;
+    --dt-radius: 16px;
+}
+
+html, body {
+    overflow-x: auto !important;
+}
+body {
+    font-family: 'Poppins',sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* Topbar -> FIXED */
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    background: #252b3b;
+    color: #fff !important;
+    border-bottom: 1px solid rgba(15,23,42,.06);
+}
+
+/* Sidebar (desktop) */
+.sidebar {
+    width: var(--sidebar-w);
+    background: var(--card);
+    border-right: 1px solid rgba(15,23,42,.06);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+}
+/* FIXED hanya saat >= lg */
+
+@media (min-width: 992px) {
+    .sidebar {
+        position: fixed;
+        top: var(--header-h);
+        left: 0;
+        height: calc(100vh - var(--header-h));
+        overflow-y: auto;
+    }
+}
+
+.sidebar .brand {
+    font-weight: 700;
+    letter-spacing: .5px;
+}
+
+.nav-section {
+    color: var(--muted);
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    margin: 1rem 0 .5rem;
+}
+
+.nav-link {
+    border-radius: 6px;
+    color: #111827;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .65rem .9rem;
+    user-select: none;
+}
+
+    .nav-link:hover {
+        background: #f3f4f6;
+    }
+
+    .nav-link.active {
+        background: #111827;
+        color: #fff;
+    }
+
+/* Toggle button (no href) */
+.submenu-toggle {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    text-align: left;
+    padding: .65rem .9rem;
+    border-radius: 6px;
+    color: #111827;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    cursor: pointer;
+}
+
+    .submenu-toggle:hover {
+        background: #f3f4f6;
+    }
+
+    .submenu-toggle:focus {
+        outline: 2px solid #e5e7eb;
+    }
+
+    .submenu-toggle .arrow {
+        margin-left: auto;
+        transition: transform .25s ease;
+        opacity: .8;
+    }
+
+.has-submenu {
+    display: block;
+}
+
+    .has-submenu > .submenu {
+        display: block;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(-4px);
+        background: #f9fafb;
+        margin-top: .2rem;
+        padding-left: 1.5rem;
+        transition: max-height .35s ease, opacity .25s ease, transform .25s ease;
+        border-left: 2px solid #e5e7eb;
+    }
+
+    .has-submenu.is-open > .submenu {
+        max-height: var(--submenu-max);
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .has-submenu.is-open > .submenu-toggle .arrow {
+        transform: rotate(180deg);
+    }
+
+    .has-submenu.is-open > .submenu-toggle {
+        background: #f3f4f6;
+    }
+
+.submenu .nav-link {
+    padding: .5rem .9rem;
+    color: #374151;
+}
+
+    .submenu .nav-link:hover {
+        background: #e5e7eb;
+    }
+
+    .submenu .nav-link.active {
+        background: var(--active-bg);
+        color: var(--active-fg);
+        font-weight: 600;
+    }
+
+/* Main area */
+.page {
+    margin: 0 auto; /* beneran center */
+    padding: 24px; /* cukup padding saja */
+}
+
+.time-display {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+    font-size: clamp(42px,6.2vw,72px);
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .4rem .7rem;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #111827;
+    font-weight: 600;
+    font-size: .875rem;
+}
+
+.pill-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.btn-solid {
+    background-color: var(--brand);
+    color: #fff;
+    padding: .9rem 1.25rem;
+    border-radius: 6px;
+    font-weight: 700;
+    border: none;
+}
+
+    .btn-solid:hover {
+        background: #1f2937;
+    }
+
+.timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.timeline-item {
+    display: flex;
+    gap: .9rem;
+    align-items: flex-start;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #94a3b8;
+    margin-top: .4rem;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+html, body {
+    height: 100%;
+}
+
+.page-wrap {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f6f7fb;
+}
+
+/* dorong konten di bawah header fixed */
+.page-main {
+    flex: 1 1 auto;
+    padding-top: calc(var(--header-h) + var(--content-top-extra)) !important;
+}
+
+/* offset konten agar tidak ketutup sidebar fixed (desktop) */
+@media (min-width: 992px) {
+    .content-offset {
+        margin-left: var(--sidebar-w) !important;
+        padding-right: var(--content-right-extra) !important;
+        /* opsional: tambah sedikit padding kiri biar lega */
+        padding-left: 40px !important;
+    }
+}
+
+/* footer gaya seperti header, end of page */
+.site-footer {
+    background: #fff;
+    border-top: 1px solid rgba(15,23,42,.06);
+    flex: 0 0 auto;
+}
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        width: 100%;
+        box-shadow: none;
+    }
+}
+
+:root{
+  --dt-bg:#fff;
+  --dt-head-bg:#0f3555;      /* ganti sesuai brand */
+  --dt-head-text:#fff;
+  --dt-row-alt:#f8fafc;
+  --dt-border:#e9eef5;
+  --dt-active:#2563eb;
+  --dt-active-2:#0ea5e9;
+  --dt-radius:16px;
+}
+
+/* Card ringan */
+.dt-card{
+  background:var(--dt-bg);
+  border:1px solid var(--dt-border);
+  border-radius:var(--dt-radius);
+  box-shadow:0 10px 22px rgba(2,8,23,.06);
+  padding:18px;
+}
+
+/* Dashboard */
+.btn-soft i {
+    vertical-align: -2px;
+}
+
+/* Card metric */
+.metric-card {
+    border: 1px solid var(--ring);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    background: var(--card);
+    height: 100%;
+}
+
+.metric-title {
+    font-weight: 600;
+    color: #6b7280;
+    font-size: .85rem;
+}
+
+.metric-value {
+    font-weight: 700;
+    font-size: 2rem;
+    letter-spacing: .2px;
+}
+
+.metric-trend.up {
+    color: var(--success);
+}
+
+.metric-trend.down {
+    color: var(--danger);
+}
+
+.icon-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: #ecfeff;
+    color: #0e7490;
+}
+
+/* Section cards */
+.panel {
+    border: 1px solid var(--ring);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: var(--shadow);
+}
+
+.panel-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--ring);
+}
+
+.panel-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.kpi-mini .kpi {
+    border-right: 1px dashed var(--ring);
+}
+
+    .kpi-mini .kpi:last-child {
+        border-right: 0;
+    }
+
+.kpi .label {
+    color: var(--muted);
+    font-size: .85rem;
+}
+
+.kpi .value {
+    font-weight: 800;
+    font-size: 1.15rem;
+}
+
+.pill-group .btn {
+    --bs-btn-padding-y: .25rem;
+    --bs-btn-padding-x: .5rem;
+    --bs-btn-font-size: .8rem;
+}
+
+/* World map placeholder */
+.world {
+    background: radial-gradient(120px 70px at 22% 38%, #eaf1fb 40%, transparent 41%) no-repeat, radial-gradient(120px 70px at 72% 45%, #eaf1fb 40%, transparent 41%) no-repeat, radial-gradient(90px 60px at 58% 68%, #eaf1fb 40%, transparent 41%) no-repeat;
+    background-color: #f7fbff;
+    border: 1px dashed #dbe6ff;
+    height: 240px;
+    border-radius: 12px;
+}
+
+.progress.thin {
+    height: 8px;
+    background: #eef2f7;
+}
+
+    .progress.thin .progress-bar {
+        border-radius: 8px;
+    }
+
+.muted {
+    color: var(--muted);
+}
+
+/*.card-header {
+    background-color: #ccc;
+}*/
+
+@media (max-width: 991.98px) {
+    .metric-value {
+        font-size: 1.6rem;
+    }
+
+    .world {
+        height: 200px;
+    }
+}
+
+/**/
+
+/* Penuhi container & jangan memaksa tabel melebar */
+#myTable, table.dataTable {
+    width: 100% !important;
+    table-layout: fixed;
+}
+
+/* Bungkus teks (override bawaan DataTables/Bootstrap yang suka nowrap) */
+#myTable th, #myTable td {
+    white-space: normal !important;
+    word-break: break-word;
+}
+
+/* Kolom sempit biar tidak nabrak */
+#myTable th:nth-child(1), #myTable td:nth-child(1) {
+    width: 60px;
+    text-align: center;
+}
+
+#myTable th:nth-child(5), #myTable td:nth-child(5) {
+    width: 160px;
+}
+
+/* Kalau tetap pakai .table-responsive, jangan paksa scroll-x */
+.table-responsive {
+    overflow-x: auto;
+}
+
+#myTable td:last-child .btn {
+    white-space: normal;
+}
+
+#myTable td:last-child .btn {
+    padding: .25rem .5rem;
+}
+
+.dataTables_length{
+    margin-bottom: 10px;
+}
+/* btn-sm */
+#myTable thead th {
+    background-color: #252b3b !important;
+    color: #fff !important;
+}
+.dataTables_wrapper {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+#myTable, table.dataTable {
+    width: 100% !important;
+}
