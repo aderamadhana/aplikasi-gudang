@@ -5,6 +5,8 @@ namespace gudang_net_baru.Models
     public class ApplicationUser : IdentityUser
     {
         public bool Status { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
         public int CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public int UpdatedBy { get; set; }

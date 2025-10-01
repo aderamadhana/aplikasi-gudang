@@ -1,67 +1,88 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Gudang</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Gudang.styles.css" asp-append-version="true" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+﻿@{
+    var isLogin = string.Equals(
+        ViewContext.RouteData.Values["controller"]?.ToString(),
+        "Login",
+        StringComparison.OrdinalIgnoreCase);
+}
 
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-</head>
+@if (isLogin)
+{
+    @RenderBody()
+}
+else
+{
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>@ViewData["Title"] - Gudang</title>
 
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- CSS -->
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/Gudang.styles.css" asp-append-version="true" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
-<script>
-    function showAlert(message, type = "success", timeout = 3000) {
-      // type: success, danger, warning, info
-      const icons = {
-        success: "bi-check-circle-fill",
-        danger: "bi-x-circle-fill",
-        warning: "bi-exclamation-triangle-fill",
-        info: "bi-info-circle-fill"
-      };
+        @* Optional head section for page-specific <head> content *@
+        @RenderSection("Head", required: false)
+    </head>
+    <body class="page-wrap">
 
-      const alertId = "alert-" + Date.now();
-      const alertHtml = `
-        <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert" style="min-width:300px; max-width:400px;">
-          <i class="bi ${icons[type]} me-2 fs-5"></i>
-          <div class="flex-grow-1">${message}</div>
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        @await Html.PartialAsync("Header")
+
+        <!-- Alerts anchor -->
+        <div id="alert-container"
+             class="position-fixed top-0 end-0 p-3"
+             style="z-index:1080;"></div>
+
+        <div class="page-main">
+            <div class="d-flex">
+                @await Html.PartialAsync("Sidebar")
+                <main class="flex-grow-1 page content-offset">
+                    @RenderBody()
+                </main>
+            </div>
         </div>
-      `;
 
-      // Tambahkan alert ke container
-      document.getElementById("alert-container").insertAdjacentHTML("beforeend", alertHtml);
+        @* Page-specific scripts *@
+        @await RenderSectionAsync("Scripts", required: false)
 
-      // Auto close
-      setTimeout(() => {
-        const alertEl = document.getElementById(alertId);
-        if (alertEl) {
-          const bsAlert = new bootstrap.Alert(alertEl);
-          bsAlert.close();
-        }
-      }, timeout);
-    }
-</script>
-<body class="page-wrap">
-    @await Html.PartialAsync("Header")
-    <div class="page-main">
-        <div class="d-flex">
-            @await Html.PartialAsync("Sidebar")
-            <main class="flex-grow-1 page content-offset">
-                @RenderBody()
-            </main>
-        </<div>
-    </div>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
-</html>
+        @* Core JS libs (order matters) *@
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+        @* Your site script *@
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+
+        <script>
+            // keep inline or move to site.js
+            function showAlert(message, type = "success", timeout = 3000) {
+                const icons = {
+                    success: "bi-check-circle-fill",
+                    danger: "bi-x-circle-fill",
+                    warning: "bi-exclamation-triangle-fill",
+                    info: "bi-info-circle-fill"
+                };
+                const alertId = "alert-" + Date.now();
+                const html = `
+                  <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert" style="min-width:300px; max-width:400px;">
+                    <i class="bi ${icons[type]} me-2 fs-5"></i>
+                    <div class="flex-grow-1">${message}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                  </div>`;
+                document.getElementById("alert-container").insertAdjacentHTML("beforeend", html);
+                setTimeout(() => {
+                    const el = document.getElementById(alertId);
+                    if (el) new bootstrap.Alert(el).close();
+                }, timeout);
+            }
+        </script>
+    </body>
+    </html>
+}
+``

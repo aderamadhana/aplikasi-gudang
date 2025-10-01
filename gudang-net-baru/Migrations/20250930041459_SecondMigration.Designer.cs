@@ -12,7 +12,7 @@ using gudang_net_baru.Services;
 namespace gudang_net_baru.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250923065512_SecondMigration")]
+    [Migration("20250930041459_SecondMigration")]
     partial class SecondMigration
     {
         /// <inheritdoc />
@@ -188,6 +188,14 @@ namespace gudang_net_baru.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
