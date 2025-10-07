@@ -22,25 +22,25 @@
         <a class="nav-link @(controller == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-grid-1x2"></i> Dashboard</a>
 
         <div class="nav-section">Master dan Konfigurasi</div>
-        <div class="has-submenu @(controller == "Role" ? "is-open" : "")">
+        <div class="has-submenu @(controller == "Role" || controller == "User" || controller == "Menu" ? "is-open" : "")">
             <button class="submenu-toggle" type="button" aria-expanded="false" aria-controls="konfigurasi">
                 <i class="bi bi-send-check"></i> Konfigurasi
                 <span class="arrow"><i class="bi bi-caret-down-fill"></i></span>
             </button>
-            <div class="submenu @(controller == "Role" ? "is-open" : "")" id="konfigurasi">
-                <a class="nav-link" href="#">User</a>
+            <div class="submenu @(controller == "Role" || controller == "User" || controller == "Menu" ? "is-open" : "")" id="konfigurasi">
+                <a class="nav-link @(controller == "User" ? "active" : "")" asp-area="" asp-controller="User" asp-action="Index">User</a>
                 <a class="nav-link @(controller == "Role" ? "active" : "")" asp-area="" asp-controller="Role" asp-action="Index">Role</a>
-                <a class="nav-link" href="#">Menu</a>
+                <a class="nav-link @(controller == "Menu" ? "active" : "")" asp-area="" asp-controller="Menu" asp-action="Index">Menu</a>
             </div>
         </div>
 
-        <div class="has-submenu">
+        <div class="has-submenu @(controller == "Barang" ? "is-open" : "")">
             <button class="submenu-toggle" type="button" aria-expanded="true" aria-controls="master">
                 <i class="bi bi-fingerprint"></i> Master
                 <span class="arrow"><i class="bi bi-caret-down-fill"></i></span>
             </button>
-            <div class="submenu" id="master">
-                <a class="nav-link" href="#">Barang</a>
+            <div class="submenu" @(controller == "Barang" ? "is-open" : "")" id="master">
+                <a class="nav-link @(controller == "Barang" ? "active" : "")" asp-area="" asp-controller="Barang" asp-action="Index">Barang</a>
             </div>
         </div>
     </div>
@@ -56,15 +56,15 @@
         <div class="nav-section">Home</div>
         <a class="nav-link @(controller == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-grid-1x2"></i> Dashboard</a>
         <div class="nav-section">Master dan Konfigurasi</div>
-        <div class="has-submenu @(controller == "Role" ? "is-open" : "")">
+        <div class="has-submenu @(controller == "Role" || controller == "User" || controller == "Menu" ? "is-open" : "")">
             <button class="submenu-toggle" type="button" aria-expanded="false" aria-controls="konfigurasi">
                 <i class="bi bi-send-check"></i> Konfigurasi
                 <span class="arrow"><i class="bi bi-caret-down-fill"></i></span>
             </button>
-            <div class="submenu @(controller == "Role" ? "is-open" : "")" id="konfigurasi">
-                <a class="nav-link" href="#">User</a>
+            <div class="submenu @(controller == "Role" || controller == "User" || controller == "Menu" ? "is-open" : "")" id="konfigurasi">
+                <a class="nav-link @(controller == "User" ? "active" : "")" asp-area="" asp-controller="User" asp-action="Index">User</a>
                 <a class="nav-link @(controller == "Role" ? "active" : "")" asp-area="" asp-controller="Role" asp-action="Index">Role</a>
-                <a class="nav-link" href="#">Menu</a>
+                <a class="nav-link @(controller == "Menu" ? "active" : "")" asp-area="" asp-controller="Menu" asp-action="Index">Menu</a>
             </div>
         </div>
 
