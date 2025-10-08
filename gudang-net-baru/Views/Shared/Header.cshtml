@@ -1,5 +1,9 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<ApplicationUser> signInManager;
+@inject UserManager<ApplicationUser> userManager;
+@{
     ViewData["ApplicationTitle"] = "APLIKASI GUDANG";
+    var appUser = await userManager.GetUserAsync(User);
 }
 <nav class="topbar py-2">
     <div class="container-fluid px-3">
@@ -14,17 +18,17 @@
             <div class="dropdown">
                 <button class="btn d-flex align-items-center gap-2" data-bs-toggle="dropdown" aria-expanded="false">
                     <img src="https://i.pravatar.cc/40?img=3" class="rounded-circle border" width="40" height="40" alt="avatar">
-                    <span class="d-none d-sm-inline fw-medium text-white">ADE RAMADHANA PRATAMA</span>
+                    <span class="d-none d-sm-inline fw-medium text-white">@(appUser.FirstName + " " + appUser.LastName)</span>
                     <i class="bi bi-caret-down-fill small text-white"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow">
                     <li class="px-3 py-2">
-                        <div class="fw-semibold">ADE RAMADHANA PRATAMA</div>
+                        <div class="fw-semibold">@(appUser.FirstName + " " + appUser.LastName)</div>
                     </li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profil</a></li>
                     <li>
-                        <form action="/logout" method="post" class="px-2 my-1">
+                        <form asp-action="Logout" asp-controller="Login" method="post" class="px-2 my-1">
                             <button type="submit" class="btn btn-dark w-100">
                                 <i class="bi bi-box-arrow-right me-2"></i>Logout
                             </button>

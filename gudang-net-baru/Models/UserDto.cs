@@ -8,7 +8,8 @@ namespace gudang_net_baru.Models
         public string FirstName { get; set; } = string.Empty;
         [Required(ErrorMessage = "Nama Belakang wajib diisi!")]
         public string LastName { get; set; } = string.Empty;
-        [Required, EmailAddress(ErrorMessage = "Email wajib diisi!")]
+        [Required(ErrorMessage = "Email wajib diisi!")]
+        [EmailAddress(ErrorMessage = "Email tidak valid!")]
         public string Email { get; set; } = string.Empty;
         [Required(ErrorMessage = "Username wajib diisi!")]
         public string UserName {  get; set; } = string.Empty;
@@ -24,5 +25,7 @@ namespace gudang_net_baru.Models
         public DateTime UpdatedAt { get; set; }
         public int DeletedBy { get; set; }
         public DateTime DeletedAt { get; set; }
+        [Required(ErrorMessage = "Role wajib diisi!")]
+        public List<string> SelectedRoleIds { get; set; }
     }
 }
