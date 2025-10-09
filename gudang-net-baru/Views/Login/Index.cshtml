@@ -108,6 +108,62 @@
         .text-muted-neo {
             color: var(--muted)
         }
+
+        .btn-classic {
+            /* Theme tokens */
+            --c-bg: #0f1d3b; /* navy */
+            --c-bg-2: #132754; /* darker navy */
+            --c-border: #0b1730; /* border */
+            --c-gloss: rgba(255,255,255,.08);
+            --c-text: #ffffff;
+            --c-ring: rgba(63,120,255,.35);
+            --r: 12px;
+            position: relative;
+            border-radius: var(--r);
+            border: 1px solid var(--c-border);
+            color: var(--c-text);
+            background: linear-gradient(to bottom, var(--c-gloss), transparent) /* soft gloss */, linear-gradient(180deg, var(--c-bg), var(--c-bg-2)); /* subtle depth */
+            ;
+            padding: 0.9rem 1.25rem;
+            font-weight: 600;
+            letter-spacing: .2px;
+            line-height: 1;
+            box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, /* top inner highlight */
+            0 2px 6px rgba(0,0,0,.25); /* classic drop */
+            transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+        }
+
+            /* Text stays crisp and centered */
+            .btn-classic .btn-text {
+                display: inline-block;
+                transform: translateY(0); /* baseline alignment */
+            }
+
+            /* Hover: slightly brighter & lifted */
+            .btn-classic:hover {
+                filter: brightness(1.03);
+                transform: translateY(-1px);
+                box-shadow: 0 1px 0 rgba(255,255,255,.10) inset, 0 6px 16px rgba(0,0,0,.28);
+            }
+
+            /* Active (pressed): classic “click” feel */
+            .btn-classic:active {
+                transform: translateY(0);
+                box-shadow: 0 2px 0 rgba(0,0,0,.25) inset, 0 2px 8px rgba(0,0,0,.22);
+                filter: brightness(.98);
+            }
+
+            /* Focus ring elegan (keyboard & a11y) */
+            .btn-classic:focus-visible {
+                outline: none;
+                box-shadow: 0 0 0 3px var(--c-ring), 0 2px 6px rgba(0,0,0,.25);
+            }
+
+            /* Disabled */
+            .btn-classic:disabled {
+                opacity: .6;
+                pointer-events: none;
+            }
     </style>
 </head>
 <body>
@@ -151,7 +207,9 @@
             </div>
 
             <div class="d-grid">
-                <button type="submit" class="btn btn-primary btn-lg">Masuk</button>
+                <button type="submit" class="btn btn-lg btn-classic" id="btnMasuk">
+                    <span class="btn-text">Masuk</span>
+                </button>
             </div>
         </form>
 

@@ -27,5 +27,7 @@ namespace gudang_net_baru.Models
         public DateTime DeletedAt { get; set; }
         [Required(ErrorMessage = "Role wajib diisi!")]
         public List<string> SelectedRoleIds { get; set; }
+        public List<string> Selected { get; set; } = new();
+        public object Id { get; internal set; } = string.Empty;
     }
 }

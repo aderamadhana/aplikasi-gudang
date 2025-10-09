@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Threading.Tasks;
 
 namespace gudang_net_baru.Controllers
 {
@@ -122,10 +124,104 @@ namespace gudang_net_baru.Controllers
                 return View(userDto);
             }
         }
-
-        public IActionResult Edit()
+        public async Task<IActionResult> EditAsync(string id)
         {
-            return View();
+            var user = await userManager.FindByIdAsync(id);
+            var userRole = await userManager.GetRolesAsync(user);
+
+            if(user == null)
+            {
+                return RedirectToAction("Index");
+            }
+            var roles = await roleManager.Roles
+                .Select(r => new RoleDto { Id = r.Id, Name = r.Name })
+                .ToListAsync();
+
+            ViewBag.Roles = roles;
+            var vm = new UserDto()
+            {
+                LastName = user.LastName,
+                FirstName = user.FirstName,
+                Email = user.Email,
+                UserName = user.UserName,
+                Selected = userRole.ToList()
+            };
+            return View(vm);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Edit(string id, UserDto userDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                var roles = await roleManager.Roles
+                .Select(r => new RoleDto { Id = r.Id, Name = r.Name })
+                .ToListAsync();
+
+                ViewBag.Roles = roles;
+                return View(userDto);
+            }
+            var user = await userManager.FindByIdAsync(id);
+            if(user == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            user.FirstName = userDto.FirstName;
+            user.LastName = userDto.LastName;
+            user.Email = userDto.Email;
+            user.UserName = userDto.UserName;
+
+            // SelectedRoleIds bisa null kalau tidak ada yang dicentang
+            var selectedRoleIds = userDto.SelectedRoleIds ?? new List<string>();
+
+            // Ambil nama role dari ID yang dipilih
+            var selectedRoleNames = await roleManager.Roles
+                .Where(r => selectedRoleIds.Contains(r.Id))
+                .Select(r => r.Name)
+                .ToListAsync();
+
+            // Role current (nama)
+            var currentRoleNames = await userManager.GetRolesAsync(user);
+
+            // Hitung diff
+            var toAdd = selectedRoleNames.Except(currentRoleNames).ToArray();
+            var toRemove = currentRoleNames.Except(selectedRoleNames).ToArray();
+
+            // Apply changes
+            if (toAdd.Length > 0)
+            {
+                var addRes = await userManager.AddToRolesAsync(user, toAdd);
+                if (!addRes.Succeeded)
+                {
+                    foreach (var e in addRes.Errors) ModelState.AddModelError("", e.Description);
+                    // re-render view bila perlu (pastikan isi ulang list roles di VM)
+                    // return View(userDto);
+                }
+            }
+
+            if (toRemove.Length > 0)
+            {
+                var remRes = await userManager.RemoveFromRolesAsync(user, toRemove);
+                if (!remRes.Succeeded)
+                {
+                    foreach (var e in remRes.Errors) ModelState.AddModelError("", e.Description);
+                    // return View(userDto);
+                }
+            }
+
+            // Update user profile lainnya
+            var result = await userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                foreach (var e in result.Errors) ModelState.AddModelError("", e.Description);
+                // return View(userDto);
+            }
+
+            // Refresh auth (sekali saja, di luar loop)
+            await signInManager.RefreshSignInAsync(user);
+
+            // Selesai
+            return RedirectToAction(nameof(Index));
         }
     }
 }
