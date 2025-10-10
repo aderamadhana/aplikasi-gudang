@@ -32,7 +32,14 @@ namespace gudang_net_baru.Controllers
                 isPersistent: loginDto.RememberMe,
                 lockoutOnFailure: false
              );
-            if (result.Succeeded) { 
+            if (result.Succeeded) {
+                var user = await userManager.FindByEmailAsync(loginDto.Email);
+                var roles = await userManager.GetRolesAsync(user);
+                if (roles.Any())
+                {
+                    HttpContext.Session.SetString("UserRole", roles.First());
+                }
+
                 return RedirectToAction("Index", "Home");
             }else
             {
@@ -50,6 +57,17 @@ namespace gudang_net_baru.Controllers
             }
 
             return RedirectToAction("Index", "Login");
+        }
+
+        [HttpPost]
+        public IActionResult SetRoleSession(string role)
+        {
+            if (!string.IsNullOrEmpty(role))
+            {
+                HttpContext.Session.SetString("UserRole", role);
+            }
+
+            return Ok();
         }
     }
 }

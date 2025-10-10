@@ -1,0 +1,106 @@
+﻿@model gudang_net_baru.Models.Konfigurasi.Menu.MenuDto;
+@{
+    var controller = ViewBag.ListController;
+    var menu_parents = ViewBag.ListParent;
+    var roles = ViewBag.ListRole;
+}
+<div class="row">
+    <div class="col-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <h3>Tambah Menu</h3>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Tipe Menu <span class="text-danger">*</span></label>
+                            <select class="form-control" asp-for="MenuType" id="tipe_menu">
+                                <option value="">Pilih</option>
+                                <option value="label">Label</option>
+                                <option value="menu">Menu</option>
+                            </select>
+                            <span asp-validation-for="MenuType" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <label>Pilih Role<span class="text-danger">*</span></label>
+                        <select class="form-control" asp-for="RoleId">
+                            <option value="">Pilih</option>
+                            @foreach (var items in roles)
+                            {
+                                <option value="@items.Id">@items.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="RoleId" class="text-danger"></span>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Nama Menu <span class="text-danger">*</span></label>
+                            <input type="text" asp-for="MenuName" class="form-control" />
+                            <span asp-validation-for="MenuName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3 hidden_items">
+                        <div class="form-group">
+                            <label>Menu Icon <span class="text-danger">*</span></label>
+                            <input type="text" asp-for="MenuIcon" class="form-control" />
+                            <span asp-validation-for="MenuIcon" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3 hidden_items">
+                        <div class="form-group">
+                            <label>Nama Controller <span class="text-danger">*</span></label>
+                            <select class="form-control" asp-for="ControllerName">
+                                <option value="">Pilih</option>
+                                @foreach (var items in controller)
+                                {
+                                    <option value="@items">@items</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col mb-3 hidden_items">
+                        <div class="form-group">
+                            <label>Nama Function <span class="text-danger">*</span></label>
+                            <input type="text" asp-for="ControllerFunction" class="form-control" />
+                            <span asp-validation-for="ControllerFunction" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3 hidden_items">
+                        <label>Menu Parent<span class="text-danger">*</span></label>
+                        <select class="form-control" asp-for="ParentId">
+                            <option value="">Pilih</option>
+                            @foreach (var items in menu_parents)
+                            {
+                                <option value="@items.Id">@items.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="ParentId" class="text-danger"></span>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Urutan <span class="text-danger">*</span></label>
+                            <input type="text" asp-for="Urutan" class="form-control" />
+                            <span asp-validation-for="Urutan" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col text-end mb-3">
+                        <button type="submit" class="btn btn-primary"> <i class="bi bi-save"></i> Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        $(".hidden_items").hide();
+        $("#tipe_menu").on("change", function () {
+            if ($(this).val() === "label") {
+                $(".hidden_items").hide();
+            } else {
+                $(".hidden_items").show();
+            }
+        });
+    });
+</script>

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace gudang_net_baru.Controllers
 {
 
-    [Authorize(Roles = "ADMIN")]
+    //[Authorize(Roles = "ADMIN")]
     public class UserController : Controller
     {
         private readonly UserManager<ApplicationUser> userManager;
@@ -58,7 +58,8 @@ namespace gudang_net_baru.Controllers
                         .Take(length)
                         .Select(r => new {
                             r.Id,
-                            r.UserName,
+                            r.FirstName,
+                            r.LastName,
                             r.Email,
                             r.Status
                         })
@@ -121,6 +122,13 @@ namespace gudang_net_baru.Controllers
             }
             else
             {
+                foreach (var error in result.Errors)
+                {
+                    Console.WriteLine($"Code: {error.Code} - Desc: {error.Description}");
+                    // Atau kalau mau pakai debug output:
+                    System.Diagnostics.Debug.WriteLine($"Code: {error.Code} - Desc: {error.Description}");
+                }
+
                 return View(userDto);
             }
         }

@@ -14,7 +14,7 @@ namespace gudang_net_baru.Models
         [Required(ErrorMessage = "Username wajib diisi!")]
         public string UserName {  get; set; } = string.Empty;
         [Required(ErrorMessage = "Password wajib diisi!")]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
         [Required(ErrorMessage = "Konfirmasi Password wajib diisi!")]
         [Compare("Password", ErrorMessage = "Konfirmasi Password dan Password tidak sesuai!")]
         public string ConfirmPassword { get; set; } = string.Empty;
@@ -26,8 +26,8 @@ namespace gudang_net_baru.Models
         public int DeletedBy { get; set; }
         public DateTime DeletedAt { get; set; }
         [Required(ErrorMessage = "Role wajib diisi!")]
-        public List<string> SelectedRoleIds { get; set; }
+        public List<string> SelectedRoleIds { get; set; } = new();
         public List<string> Selected { get; set; } = new();
-        public object Id { get; internal set; } = string.Empty;
+        //public object Id { get; internal set; } = string.Empty;
     }
 }

@@ -16,7 +16,7 @@ namespace gudang_net_baru.Services
             }
 
             // 1) Ensure role exists
-            if (!await roleManager.RoleExistsAsync("admin"))
+            if (!await roleManager.RoleExistsAsync("ADMIN"))
             {
                 Console.WriteLine("Creating 'admin' role...");
                 var roleResult = await roleManager.CreateAsync(new IdentityRole("admin"));

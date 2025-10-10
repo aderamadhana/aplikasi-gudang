@@ -3,6 +3,7 @@
     var action = ViewContext.RouteData.Values["action"]?.ToString(); 
     var user = await userManager.GetUserAsync(User);
     var roles = user != null ? await userManager.GetRolesAsync(user) : new List<string>();
+    var session_role = @Context.Session.GetString("UserRole");
 }
 
 @using Microsoft.AspNetCore.Identity;
@@ -15,7 +16,9 @@
         <select id="roleSelect" class="form-select form-select-sm text-uppercase fw-bold">
             @foreach (var role in roles)
             {
-                <option value="@role">@role.ToUpper()</option>
+                <option value="@role" selected="@(role == session_role)">
+                    @role.ToUpper()
+                </option>
             }
         </select>
         <div class="nav-section">Home</div>
@@ -79,3 +82,16 @@
         </div>
     </div>
 </div>
+<script>
+    $("#roleSelect").on("change", function () {
+        var selectedRole = $(this).val();
+
+        $.post('/Login/SetRoleSession', { role: selectedRole }, function () {
+            showAlert("Role berhasil diganti!","success");
+           
+            setTimeout(function () {
+                location.reload();
+            }, 1000); // reload setelah 1 detik
+        });
+    });
+</script>

@@ -1,4 +1,5 @@
 ﻿using gudang_net_baru.Models;
+using gudang_net_baru.Models.Konfigurasi.Menu;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,5 +11,7 @@ namespace gudang_net_baru.Services
         {
 
         }
+
+        public DbSet<MenuEntity> Menu { get; set; }
     }
 }
