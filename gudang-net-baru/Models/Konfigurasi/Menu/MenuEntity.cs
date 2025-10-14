@@ -9,7 +9,7 @@ namespace gudang_net_baru.Models.Konfigurasi.Menu
         [Key]
         [NotNull]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public string IdMenu { get; set; }
+        public string? IdMenu { get; set; } = default!;
         [AllowNull]
         public string MenuName { get; set; }
         [AllowNull]
@@ -17,27 +17,27 @@ namespace gudang_net_baru.Models.Konfigurasi.Menu
         [AllowNull]
         public string ControllerFunction { get; set; }
         [AllowNull]
-        public string MenuType { get; set; }
+        public string? MenuType { get; set; }
         [AllowNull]
-        public string ParentId {  get; set; }
+        public string? ParentId {  get; set; }
         [AllowNull]
-        public string MenuIcon { get; set; }
+        public string? MenuIcon { get; set; }
         [AllowNull]
-        public string RoleId { get; set; }
+        public string? RoleId { get; set; }
         [AllowNull]
-        public bool Status { get; set; }
+        public bool? Status { get; set; }
         [AllowNull]
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
         [AllowNull]
-        public string CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
         [AllowNull]
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
         [AllowNull]
-        public string UpdatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
         [AllowNull]
-        public DateTime DeletedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
         [AllowNull]
-        public string DeletedBy { get; set; }
+        public string? DeletedBy { get; set; }
         [AllowNull]
         public int Urutan { get; set; }
     }

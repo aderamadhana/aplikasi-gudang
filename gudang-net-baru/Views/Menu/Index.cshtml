@@ -16,15 +16,18 @@
                 <!-- Actions -->
                 <div class="col-12 col-md-9">
                     <div class="d-flex flex-wrap gap-2 justify-content-start justify-content-md-end">
+                        <a class="btn btn-outline-warning" asp-controller="Menu" asp-action="Ordering">
+                            <i class="bi bi-sort-up"></i> Urutkan Menu
+                        </a>
                         <a class="btn btn-outline-success" asp-controller="Menu" asp-action="Create">
                             <i class="bi bi-plus-circle"></i> Tambah Data
                         </a>
-                        <button class="btn btn-success" onclick="exportData()">
+                        @* <button class="btn btn-success" onclick="exportData()">
                             <i class="bi bi-file-earmark-excel"></i> Export
                         </button>
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#import-data">
                             <i class="bi bi-file-earmark-arrow-up"></i> Import
-                        </button>
+                        </button> *@
                     </div>
                 </div>
             </div>
@@ -37,9 +40,9 @@
                 <thead class="table-primary text-center">
                     <tr>
                         <th style="width: 10%;">No</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
+                        <th>Menu Name</th>
+                        <th>Menu Type</th>
+                        <th>Urutan</th>
                         <th>Status</th>
                         <th style="width: 10%;">Aksi</th>
                     </tr>
@@ -114,7 +117,7 @@
               serverSide: true,
               scrollX: false,
               ajax: {
-                    url: '/User/GetUser?status='+status,
+                    url: '/Menu/GetMenu?status='+status,
                     type: 'POST',
               },
               columns: [
@@ -123,9 +126,9 @@
                   render: (data, type, row, meta) => meta.row + 1, // kasih nomor urut
                   defaultContent: ''
                 },
-                { data: 'firstName', defaultContent: '' },
-                { data: 'lastName', defaultContent: '' },
-                { data: 'email', defaultContent: '' },
+                { data: 'menuName', defaultContent: '' },
+                { data: 'menuType', defaultContent: '' },
+                { data: 'urutan', defaultContent: '' },
                 {
                   data: 'status',
                   render: (d, type, row) => {
@@ -139,11 +142,11 @@
                 {
                   data: null,
                   render: (d, type, row) => {
-                      const id   = row.id ?? '';
-                      const name = String(row.userName ?? '').replace(/"/g, '&quot;');
+                      const id   = row.idMenu ?? '';
+                      const name = String(row.menuName ?? '').replace(/"/g, '&quot;');
 
                       return row.status
-                          ? `<a href="/User/Edit/${id}"
+                          ? `<a href="/Menu/Edit/${id}"
                                class="btn btn-sm btn-primary me-2"
                                onclick="return confirmEdit(event, this)">
                               <i class="bi bi-pencil"></i> Edit
@@ -192,7 +195,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
             // Contoh hit API pakai fetch
-            fetch(`/User/ChangeStatus/${data_id}?status=${status}`, {
+            fetch(`/Menu/ChangeStatus/${data_id}?status=${status}`, {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json'
@@ -227,7 +230,7 @@
         fd.append("file", file.files[0]);
 
         $.ajax({
-            url: "/User/Import",
+            url: "/Menu/Import",
             type: "POST",
             data: fd,
             processData: false,
@@ -253,7 +256,7 @@
     function hapusData(data_id, data_nama){
         Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: `Hapus data username : ${data_nama} ?`,
+            text: `Hapus data menu : ${data_nama} ?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Ya',
@@ -261,7 +264,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
             // Contoh hit API pakai fetch
-            fetch(`/Role/Delete/${data_id}`, {
+            fetch(`/Menu/Delete/${data_id}`, {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json'
@@ -289,7 +292,7 @@
         const status = $('#filtered-status').val();
 
         $.ajax({
-          url: '/Role/Export',
+          url: '/Menu/Export',
           method: 'POST',
           contentType: 'application/json',
           data: JSON.stringify({ status }),

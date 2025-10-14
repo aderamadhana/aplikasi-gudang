@@ -19,12 +19,12 @@
                         <a class="btn btn-outline-success" asp-controller="User" asp-action="Create">
                             <i class="bi bi-plus-circle"></i> Tambah Data
                         </a>
-                        <button class="btn btn-success" onclick="exportData()">
+                        @* <button class="btn btn-success" onclick="exportData()">
                             <i class="bi bi-file-earmark-excel"></i> Export
                         </button>
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#import-data">
                             <i class="bi bi-file-earmark-arrow-up"></i> Import
-                        </button>
+                        </button> *@
                     </div>
                 </div>
             </div>
@@ -37,8 +37,7 @@
                 <thead class="table-primary text-center">
                     <tr>
                         <th style="width: 10%;">No</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
+                        <th>Nama Lengkap</th>
                         <th>Email</th>
                         <th>Status</th>
                         <th style="width: 10%;">Aksi</th>
@@ -123,8 +122,13 @@
                   render: (data, type, row, meta) => meta.row + 1, // kasih nomor urut
                   defaultContent: ''
                 },
-                { data: 'firstName', defaultContent: '' },
-                { data: 'lastName', defaultContent: '' },
+                {
+                  data: null,
+                  render: (d, type, row) => {
+                    return row.firstName + " " + row.lastName;
+                  },
+                  defaultContent: '',
+                },
                 { data: 'email', defaultContent: '' },
                 {
                   data: 'status',

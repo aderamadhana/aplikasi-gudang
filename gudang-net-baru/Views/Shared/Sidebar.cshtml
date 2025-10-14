@@ -1,18 +1,50 @@
-﻿@{
+﻿@using System.Text.Json
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor Http
+
+@{
     var controller = ViewContext.RouteData.Values["controller"]?.ToString();
     var action = ViewContext.RouteData.Values["action"]?.ToString(); 
     var user = await userManager.GetUserAsync(User);
     var roles = user != null ? await userManager.GetRolesAsync(user) : new List<string>();
     var session_role = @Context.Session.GetString("UserRole");
+    var json = Http.HttpContext!.Session.GetString("Menu");
+    var menu = string.IsNullOrWhiteSpace(json)
+        ? new List<MenuDto>()
+        : JsonSerializer.Deserialize<List<MenuDto>>(json);
+
+    // safety: if any node has null Children, treat as empty
+    void EnsureChildrenNotNull(IEnumerable<MenuDto> nodes)
+    {
+        foreach (var n in nodes)
+        {
+            n.Children ??= new List<MenuDto>();
+            EnsureChildrenNotNull(n.Children);
+        }
+    }
+    EnsureChildrenNotNull(menu);
+
+    // Map menuName -> controller (adjust as needed)
+    string ControllerOf(string name) => name switch
+    {
+        "Dashboard" => "Home",
+        _ => name // "User" -> UserController, "Role" -> RoleController, etc.
+    };
+
+    bool IsActive(string name, string currentController) =>
+        string.Equals(ControllerOf(name), currentController, StringComparison.OrdinalIgnoreCase);
 }
 
 @using Microsoft.AspNetCore.Identity;
+@using gudang_net_baru.Models.Konfigurasi.Menu
 @inject SignInManager<ApplicationUser> signInManager;
 @inject UserManager<ApplicationUser> userManager;
 
+</select>
 <aside class="sidebar d-none d-lg-flex p-3">
     <div class="d-flex flex-column w-100">
-        <div class="nav-section">Ganti Role</div>
+        <div class="nav-section">
+            Ganti Role
+        </div>
         <select id="roleSelect" class="form-select form-select-sm text-uppercase fw-bold">
             @foreach (var role in roles)
             {
@@ -21,31 +53,52 @@
                 </option>
             }
         </select>
-        <div class="nav-section">Home</div>
-        <a class="nav-link @(controller == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+        @foreach (var menu_items in menu)
+        {
+            @if (menu_items.MenuType == "label")
+            {
+                <div class="nav-section">@menu_items.MenuName</div>
+            }
+            else if (menu_items.Children.Any())
+            {
+                // parent with submenu
+                var isOpen = menu_items.Children.Any(c => IsActive(c.MenuName, controller));
+                var submenuId = $"submenu_{menu_items.IdMenu}";
 
-        <div class="nav-section">Master dan Konfigurasi</div>
-        <div class="has-submenu @(controller == "Role" || controller == "User" || controller == "Menu" ? "is-open" : "")">
-            <button class="submenu-toggle" type="button" aria-expanded="false" aria-controls="konfigurasi">
-                <i class="bi bi-send-check"></i> Konfigurasi
-                <span class="arrow"><i class="bi bi-caret-down-fill"></i></span>
-            </button>
-            <div class="submenu @(controller == "Role" || controller == "User" || controller == "Menu" ? "is-open" : "")" id="konfigurasi">
-                <a class="nav-link @(controller == "User" ? "active" : "")" asp-area="" asp-controller="User" asp-action="Index">User</a>
-                <a class="nav-link @(controller == "Role" ? "active" : "")" asp-area="" asp-controller="Role" asp-action="Index">Role</a>
-                <a class="nav-link @(controller == "Menu" ? "active" : "")" asp-area="" asp-controller="Menu" asp-action="Index">Menu</a>
-            </div>
-        </div>
+                <div class="has-submenu @(isOpen ? "is-open" : "")">
+                    <button class="submenu-toggle" type="button"
+                            aria-expanded="@(isOpen ? "true" : "false")"
+                            aria-controls="@submenuId">
+                        <i class="bi bi-send-check"></i> @menu_items.MenuName
+                        <span class="arrow"><i class="bi bi-caret-down-fill"></i></span>
+                    </button>
 
-        <div class="has-submenu @(controller == "Barang" ? "is-open" : "")">
-            <button class="submenu-toggle" type="button" aria-expanded="true" aria-controls="master">
-                <i class="bi bi-fingerprint"></i> Master
-                <span class="arrow"><i class="bi bi-caret-down-fill"></i></span>
-            </button>
-            <div class="submenu" @(controller == "Barang" ? "is-open" : "")" id="master">
-                <a class="nav-link @(controller == "Barang" ? "active" : "")" asp-area="" asp-controller="Barang" asp-action="Index">Barang</a>
-            </div>
-        </div>
+                    <div class="submenu @(isOpen ? "is-open" : "")" id="@submenuId">
+                        @foreach (var child in menu_items.Children.OrderBy(c => c.Urutan))
+                        {
+                            var childCtrl = ControllerOf(child.ControllerName);
+                            <a class="nav-link @(IsActive(child.MenuName, controller) ? "active" : "")"
+                               asp-area=""
+                               asp-controller="@childCtrl"
+                               asp-action="Index">
+                                @child.MenuName
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                // single link (no children)
+                var linkCtrl = ControllerOf(menu_items.ControllerName);
+                <a class="nav-link @(IsActive(menu_items.MenuName, controller) ? "active" : "")"
+                   asp-area=""
+                   asp-controller="@linkCtrl"
+                   asp-action="Index">
+                    <i class="bi bi-grid-1x2"></i> @menu_items.MenuName
+                </a>
+            }
+        }
     </div>
 </aside>
 

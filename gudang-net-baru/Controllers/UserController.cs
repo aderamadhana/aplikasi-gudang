@@ -99,7 +99,7 @@ namespace gudang_net_baru.Controllers
             {
                 LastName = userDto.LastName,
                 FirstName = userDto.FirstName,
-                UserName = userDto.UserName,
+                UserName = userDto.Email,
                 Email = userDto.Email, 
                 Status = true,
                 CreatedBy = 1,
@@ -151,7 +151,7 @@ namespace gudang_net_baru.Controllers
                 LastName = user.LastName,
                 FirstName = user.FirstName,
                 Email = user.Email,
-                UserName = user.UserName,
+                UserName = user.Email,
                 Selected = userRole.ToList()
             };
             return View(vm);
@@ -177,7 +177,8 @@ namespace gudang_net_baru.Controllers
             user.FirstName = userDto.FirstName;
             user.LastName = userDto.LastName;
             user.Email = userDto.Email;
-            user.UserName = userDto.UserName;
+            user.UserName = userDto.Email;
+
 
             // SelectedRoleIds bisa null kalau tidak ada yang dicentang
             var selectedRoleIds = userDto.SelectedRoleIds ?? new List<string>();
@@ -219,15 +220,58 @@ namespace gudang_net_baru.Controllers
 
             // Update user profile lainnya
             var result = await userManager.UpdateAsync(user);
+            if (!string.IsNullOrWhiteSpace(userDto.Password))
+            {
+                IdentityResult passRes;
+
+                // Pastikan token provider sudah ada: .AddDefaultTokenProviders() di Program.cs
+                if (await userManager.HasPasswordAsync(user))
+                {
+                    var token = await userManager.GeneratePasswordResetTokenAsync(user);
+                    passRes = await userManager.ResetPasswordAsync(user, token, userDto.Password);
+                }
+                else
+                {
+                    passRes = await userManager.AddPasswordAsync(user, userDto.Password);
+                }
+
+                if (!passRes.Succeeded)
+                {
+                    // TAMPILKAN di UI + LOG
+                    foreach (var e in passRes.Errors)
+                    {
+                        ModelState.AddModelError(nameof(UserDto.Password), e.Description);
+                        System.Diagnostics.Debug.WriteLine($"[PwdErr] {e.Code}: {e.Description}");
+                    }
+
+                    // roles untuk re-render view
+                    ViewBag.Roles = await roleManager.Roles
+                        .Select(r => new RoleDto { Id = r.Id, Name = r.Name })
+                        .ToListAsync();
+                    return View(userDto);
+                }
+
+                // ✅ Verifikasi betul-betul sudah terganti
+                var match = await userManager.CheckPasswordAsync(user, userDto.Password);
+                System.Diagnostics.Debug.WriteLine($"[PwdCheck] match={match}");
+                if (!match)
+                {
+                    ModelState.AddModelError(nameof(UserDto.Password),
+                        "Password tidak ter-set meski reset sukses. Cek konfigurasi/DB.");
+                    ViewBag.Roles = await roleManager.Roles
+                        .Select(r => new RoleDto { Id = r.Id, Name = r.Name })
+                        .ToListAsync();
+                    return View(userDto);
+                }
+            }
+
             if (!result.Succeeded)
             {
                 foreach (var e in result.Errors) ModelState.AddModelError("", e.Description);
                 // return View(userDto);
             }
-
             // Refresh auth (sekali saja, di luar loop)
-            await signInManager.RefreshSignInAsync(user);
-
+            //await signInManager.RefreshSignInAsync(user);
             // Selesai
             return RedirectToAction(nameof(Index));
         }

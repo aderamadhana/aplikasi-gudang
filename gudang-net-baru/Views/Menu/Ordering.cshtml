@@ -1,0 +1,88 @@
+﻿@{
+    var menu = ViewBag.Menu;
+}
+<h3 class="mb-4 fw-bold"> Ordering Menu</h3>
+<ul id="items-1" class="list-group sortable">
+    @foreach (var item in menu) {
+        <li class="list-group-item" data-id="@item.IdMenu">
+            <span class="drag-handle">⋮⋮</span> @item.MenuName
+            <ul class="list-group sortable ms-4">
+                @if (item.Children != null)
+                {
+                    @foreach (var item_child in item.Children)
+                    {
+                        <li class="list-group-item" data-id="@item_child.IdMenu">
+                        <span class="drag-handle">⋮⋮</span> @item_child.MenuName
+                    </li>
+                    }
+                }
+            </ul>
+        </li>
+    }
+</ul>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script>
+    // init all ULs that should be droppable
+    function initNestedSortables(root = document) {
+      root.querySelectorAll('ul.sortable').forEach(ul => {
+        if (ul._sortable) return; // prevent double init
+        ul._sortable = new Sortable(ul, {
+          group: { name: 'menus', pull: true, put: true },
+          animation: 150,
+          handle: '.drag-handle',                // drag only by handle
+          draggable: '> li.list-group-item',     // only direct LI children
+          ghostClass: 'sortable-ghost',
+          chosenClass: 'sortable-chosen',
+          fallbackOnBody: true,
+          swapThreshold: 0.65,
+
+          // when item is dropped (moved or re-ordered)
+          onEnd(evt) {
+            applyOrdering(evt.to); // compute new order under the new parent
+            // you can also send a single move:
+            const movedId = evt.item.dataset.id;
+            const newParentId = parentIdOfList(evt.to);
+            const newIndex = evt.newIndex;
+            console.log('moved', { movedId, newParentId, newIndex });
+          }
+        });
+      });
+    }
+
+    // Helper: get parent id for a child UL
+    function parentIdOfList(ul) {
+      const parentLi = ul.closest('li.list-group-item'); // direct or nested
+      return parentLi ? parentLi.dataset.id : null;       // null = root
+    }
+
+    // Recompute sibling order for the list just changed
+    function applyOrdering(ul) {
+      const parentId = parentIdOfList(ul);
+      const order = Array.from(ul.children)
+        .filter(el => el.matches('li.list-group-item'))
+        .map((li, i) => ({ id: li.dataset.id, parentId, sort: i }));
+      console.log('order under parent', parentId, order);
+      // TODO: send `order` to server to update ParentId/SortOrder
+    }
+
+    // (Optional) serialize whole tree
+    function serializeList(ul) {
+      return Array.from(ul.children)
+        .filter(li => li.matches('li.list-group-item'))
+        .map(li => {
+          const child = li.querySelector(':scope > ul.sortable');
+          return { id: li.dataset.id, children: child ? serializeList(child) : [] };
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initNestedSortables();
+
+      // Example: get full tree
+      // const tree = serializeList(document.getElementById('items-1'));
+      // console.log(JSON.stringify(tree, null, 2));
+    });
+</script>

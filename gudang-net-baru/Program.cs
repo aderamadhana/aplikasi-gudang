@@ -1,9 +1,13 @@
-using gudang_net_baru.Models;
+﻿using gudang_net_baru.Models;
 using gudang_net_baru.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole(); // tampil di terminal / Output
+builder.Logging.AddDebug();   // tampil di Output → Debug
+builder.Logging.SetMinimumLevel(LogLevel.Debug); // tampilkan sampai Debug
 
 // Tambahkan session service
 builder.Services.AddDistributedMemoryCache();
@@ -29,7 +33,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
         options.Password.RequireNonAlphanumeric = false;
         options.Password.RequireUppercase = false;
         options.Password.RequireLowercase = false;
-    }).AddEntityFrameworkStores<ApplicationDbContext>();
+    }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders(); ;
 
 var app = builder.Build();
 // Add services to the container.

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace gudang_net_baru.Controllers
 {
@@ -26,6 +27,53 @@ namespace gudang_net_baru.Controllers
             return View();
         }
 
+        [HttpPost]
+        public IActionResult getMenu(bool status)
+        {
+
+            // DataTables params
+            var draw = Request.Form["draw"].FirstOrDefault();
+            int start = int.Parse(Request.Form["start"].FirstOrDefault() ?? "0");
+            int length = int.Parse(Request.Form["length"].FirstOrDefault() ?? "10");
+            string search = Request.Form["search[value]"].FirstOrDefault() ?? "";
+
+            // permanent constraints for this endpoint
+            var baseQuery = context.Menu
+                .Where(r => r.Status == status);
+
+            // total BEFORE user search, AFTER permanent constraints
+            var recordsTotal = baseQuery.Count();
+
+            // apply search
+            var filteredQuery = baseQuery;
+            if (!string.IsNullOrWhiteSpace(search))
+                filteredQuery = filteredQuery.Where(r =>
+                    r.MenuName.Contains(search) || r.MenuType.Contains(search));
+
+            var recordsFiltered = filteredQuery.Count();
+
+            // page
+            var data = filteredQuery.OrderBy(r => r.Urutan)
+                        .Skip(start)
+                        .Take(length)
+                        .Select(r => new {
+                            r.IdMenu,
+                            r.MenuName,
+                            r.MenuType,
+                            r.Urutan,
+                            r.Status
+                        })
+                        .ToList();
+
+            return Json(new
+            {
+                draw,
+                recordsTotal,
+                recordsFiltered,
+                data
+            });
+        }
+
         public async Task<IActionResult> CreateAsync()
         {
             var list_controller = adp.ActionDescriptors.Items
@@ -40,8 +88,16 @@ namespace gudang_net_baru.Controllers
                 .OrderBy(r => r.Name)
                 .ToListAsync();
 
-            var list_parent = context.Menu
-                .Where(m => m.ParentId == null && m.Status == true && m.MenuType == "menu").ToList();
+            var list_parent = await context.Menu
+                .Where(m => m.MenuType == "menu" && m.ParentId == null && m.Status == true)
+                .Select(m => new {
+                    m.IdMenu,
+                    m.MenuName,
+                    m.MenuType,
+                    m.ParentId,
+                    m.Status
+                })
+                .ToListAsync();
 
             ViewBag.ListController = list_controller;
             ViewBag.ListRole = list_role;
@@ -50,14 +106,122 @@ namespace gudang_net_baru.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create(MenuDto menuDto)
+        public async Task<IActionResult> Create(MenuDto menuDto)
         {
             if (!ModelState.IsValid)
             {
+                var list_controller = adp.ActionDescriptors.Items
+               .OfType<ControllerActionDescriptor>()
+               .Select(d => d.ControllerTypeInfo.Name.Replace("Controller", ""))
+               .Distinct()
+               .OrderBy(n => n)
+               .ToList();
+
+                var list_role = await roleManager.Roles
+                    .Select(r => new RoleDto { Id = r.Id, Name = r.Name })
+                    .OrderBy(r => r.Name)
+                    .ToListAsync();
+
+                var list_parent = await context.Menu
+                    .Where(m => m.MenuType == "menu" && m.ParentId == null && m.Status == true)
+                    .Select(m => new {
+                        m.IdMenu,
+                        m.MenuName,
+                        m.MenuType,
+                        m.ParentId,
+                        Status = m.Status ?? false
+                    })
+                    .ToListAsync();
+
+                ViewBag.ListController = list_controller;
+                ViewBag.ListRole = list_role;
+                ViewBag.ListParent = list_parent;
                 return View(menuDto);
             }
 
+            var menu = new MenuEntity()
+            {
+                IdMenu = Guid.NewGuid().ToString("N"),
+                MenuName = menuDto.MenuName,
+                MenuType = menuDto.MenuType,
+                RoleId = menuDto.RoleId,
+                Urutan = menuDto.Urutan,
+                MenuIcon = menuDto.MenuIcon,
+                ControllerName = menuDto.ControllerName,
+                ControllerFunction = menuDto.ControllerFunction,
+                ParentId = menuDto.ParentId,
+                Status = true,
+                CreatedAt = DateTime.Now,
+                CreatedBy = HttpContext.Session.GetString("UserId")
+            };
+
+            context.Menu.Add(menu);
+            context.SaveChanges();
+
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Ordering()
+        {
+            var parentsWithChildren = await context.Menu
+                .Where(m => m.MenuType == "menu" && m.ParentId == null && m.Status == true)
+                .Select(m => new {
+                    m.IdMenu,
+                    m.MenuName,
+                    m.MenuType,
+                    m.ParentId,
+                    m.Urutan,
+                    Status = m.Status ?? false,
+                    Children = context.Menu
+                        .Where(c => c.ParentId == m.IdMenu && c.Status == true && c.MenuType == "menu")
+                        .Select(c => new {
+                            c.IdMenu,
+                            c.MenuName,
+                            c.MenuType,
+                            c.ParentId,
+                            c.Urutan,
+                            Status = c.Status ?? false
+                        })
+                        .OrderBy(c => c.Urutan)
+                        .ToList()
+                })
+                .OrderBy(m => m.Urutan)
+                .ToListAsync();
+
+            ViewBag.Menu = parentsWithChildren;
+            
+            return View();
+        }
+
+        public async Task<IActionResult> EditAsync()
+        {
+            var list_controller = adp.ActionDescriptors.Items
+               .OfType<ControllerActionDescriptor>()
+               .Select(d => d.ControllerTypeInfo.Name.Replace("Controller", ""))
+               .Distinct()
+               .OrderBy(n => n)
+               .ToList();
+
+            var list_role = await roleManager.Roles
+                .Select(r => new RoleDto { Id = r.Id, Name = r.Name })
+                .OrderBy(r => r.Name)
+                .ToListAsync();
+
+            var list_parent = await context.Menu
+                .Where(m => m.MenuType == "menu" && m.ParentId == null && m.Status == true)
+                .Select(m => new {
+                    m.IdMenu,
+                    m.MenuName,
+                    m.MenuType,
+                    m.ParentId,
+                    m.Status
+                })
+                .ToListAsync();
+
+            ViewBag.ListController = list_controller;
+            ViewBag.ListRole = list_role;
+            ViewBag.ListParent = list_parent;
+            return View();
         }
     }
 }
