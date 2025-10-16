@@ -39,7 +39,6 @@
 @inject SignInManager<ApplicationUser> signInManager;
 @inject UserManager<ApplicationUser> userManager;
 
-</select>
 <aside class="sidebar d-none d-lg-flex p-3">
     <div class="d-flex flex-column w-100">
         <div class="nav-section">
@@ -62,7 +61,7 @@
             else if (menu_items.Children.Any())
             {
                 // parent with submenu
-                var isOpen = menu_items.Children.Any(c => IsActive(c.MenuName, controller));
+                var isOpen = menu_items.Children.Any(c => IsActive(c.ControllerName, controller));
                 var submenuId = $"submenu_{menu_items.IdMenu}";
 
                 <div class="has-submenu @(isOpen ? "is-open" : "")">
@@ -77,7 +76,7 @@
                         @foreach (var child in menu_items.Children.OrderBy(c => c.Urutan))
                         {
                             var childCtrl = ControllerOf(child.ControllerName);
-                            <a class="nav-link @(IsActive(child.MenuName, controller) ? "active" : "")"
+                            <a class="nav-link @(IsActive(child.ControllerName, controller) ? "active" : "")"
                                asp-area=""
                                asp-controller="@childCtrl"
                                asp-action="Index">

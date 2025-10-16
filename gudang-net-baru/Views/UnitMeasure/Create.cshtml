@@ -1,0 +1,53 @@
+﻿@model gudang_net_baru.Models.Master.UnitMeasure.UnitMeasureDto
+@{
+}
+<div class="row">
+    <div class="col-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <h3>Tambah Unit Measure</h3>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>EA<span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" asp-for="Ea" />
+                            <span asp-validation-for="Ea" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Box<span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" asp-for="Box" />
+                            <span asp-validation-for="Box" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Carton<span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" asp-for="Carton" />
+                            <span asp-validation-for="Carton" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Pallet<span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" asp-for="Pallet" />
+                            <span asp-validation-for="Pallet" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Conversion<span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" asp-for="Conversion" />
+                            <span asp-validation-for="Conversion" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col text-end mb-3">
+                        <button type="submit" class="btn btn-primary"> <i class="bi bi-save"></i> Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

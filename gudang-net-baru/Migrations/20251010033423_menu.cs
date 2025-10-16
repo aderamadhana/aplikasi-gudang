@@ -29,7 +29,8 @@ namespace gudang_net_baru.Migrations
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Urutan = table.Column<int>(type: "bit", nullable: false),
                 },
                 constraints: table =>
                 {

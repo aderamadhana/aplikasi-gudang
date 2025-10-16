@@ -1,0 +1,46 @@
+﻿@model gudang_net_baru.Models.Master.Supplier.SupplierDto
+@{
+}
+<div class="row">
+    <div class="col-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <h3>Tambah Supplier</h3>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Kode Supplier <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" asp-for="KodeSupplier" />
+                            <span asp-validation-for="KodeSupplier" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Nama Supplier <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" asp-for="NamaSupplier" />
+                            <span asp-validation-for="NamaSupplier" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Alamat <span class="text-danger">*</span></label>
+                            <textarea class="form-control" asp-for="Alamat"></textarea>
+                            <span asp-validation-for="Alamat" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Term of Delivery <span class="text-danger">*</span></label>
+                            <textarea class="form-control" asp-for="TermOfDelivery"></textarea>
+                            <span asp-validation-for="TermOfDelivery" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col text-end mb-3">
+                        <button type="submit" class="btn btn-primary"> <i class="bi bi-save"></i> Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

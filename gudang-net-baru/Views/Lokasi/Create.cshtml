@@ -1,0 +1,52 @@
+﻿@model gudang_net_baru.Models.Master.Lokasi.LokasiDto
+@{
+}
+<div class="row">
+    <div class="col-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <h3>Tambah Lokasi</h3>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Nama Warehouse <span class="text-danger">*</span></label>
+                            <select class="form-control" asp-for="Warehouse">
+                                <option value="">Pilih</option>
+                                <option value="Zone">Zone</option>
+                                <option value="Aisle">Aisle</option>
+                                <option value="Rack">Rack</option>
+                                <option value="Bin">Bin</option>
+                            </select>
+                            <span asp-validation-for="Warehouse" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Tipe Lokasi <span class="text-danger">*</span></label>
+                            <select class="form-control" asp-for="TipeLokasi">
+                                <option value="">Pilih</option>
+                                <option value="Staging">Staging</option>
+                                <option value="Picking">Picking</option>
+                                <option value="Reserve">Reserve</option>
+                                <option value="Packing">Packing</option>
+                                <option value="QC">QC</option>
+                                <option value="Return">Return</option>
+                            </select>
+                            <span asp-validation-for="TipeLokasi" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Kapasitas <span class="text-danger">*</span></label>
+                            <input type="number" min="0" class="form-control" asp-for="Kapasitas" />
+                            <span asp-validation-for="Kapasitas" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col text-end mb-3">
+                        <button type="submit" class="btn btn-primary"> <i class="bi bi-save"></i> Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

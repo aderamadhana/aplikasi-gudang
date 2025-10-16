@@ -1,0 +1,74 @@
+﻿@model gudang_net_baru.Models.Master.Sku.SkuDto
+@{
+}
+<div class="row">
+    <div class="col-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <h3>Tambah Sku</h3>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Kode SKU <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" asp-for="KodeSku" />
+                            <span asp-validation-for="KodeSku" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Nama Barang <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" asp-for="NamaBarang" />
+                            <span asp-validation-for="NamaBarang" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Deskripsi <span class="text-danger">*</span></label>
+                            <textarea class="form-control" asp-for="Deskripsi"></textarea>
+                            <span asp-validation-for="Deskripsi" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Unit Measure <span class="text-danger">*</span></label>
+                            <select class="form-control" asp-for="UnitMeasureId">
+                                <option value="">Pilih</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Dimensi/Berat <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" asp-for="Dimensi" />
+                            <span asp-validation-for="Dimensi" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Jenis Barang <span class="text-danger">*</span></label>
+                            <select class="form-control" asp-for="JenisBarang">
+                                <option value="">Pilih</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Fragile">Fragile</option>
+                                <option value="Temperature-Controlled">Temperature-Controlled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Lot Tracking <span class="text-danger">*</span></label>
+                            <select class="form-control" asp-for="LotTracking">
+                                <option value="">Pilih</option>
+                                <option value="Ya">Ya</option>
+                                <option value="Tidak">Tidak</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col text-end mb-3">
+                        <button type="submit" class="btn btn-primary"> <i class="bi bi-save"></i> Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

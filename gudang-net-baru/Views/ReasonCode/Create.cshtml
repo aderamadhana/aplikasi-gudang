@@ -1,0 +1,38 @@
+﻿@model gudang_net_baru.Models.Master.ReasonCode.ReasonCodeDto
+@{
+}
+<div class="row">
+    <div class="col-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <h3>Tambah Reason Code</h3>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Adjustment <span class="text-danger">*</span></label>
+                            <textarea class="form-control" asp-for="Adjustment"></textarea>
+                            <span asp-validation-for="Adjustment" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Return <span class="text-danger">*</span></label>
+                            <textarea class="form-control" asp-for="Return"></textarea>
+                            <span asp-validation-for="Return" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Transfer <span class="text-danger">*</span></label>
+                            <textarea class="form-control" asp-for="Transfer"></textarea>
+                            <span asp-validation-for="Transfer" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col text-end mb-3">
+                        <button type="submit" class="btn btn-primary"> <i class="bi bi-save"></i> Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

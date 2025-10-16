@@ -1,0 +1,42 @@
+﻿@model gudang_net_baru.Models.Master.Customer.CustomerDto
+@{
+}
+<div class="row">
+    <div class="col-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <h3>Tambah Customer</h3>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Nama Customer <span class="text-danger">*</span></label>
+                            <input type="text" asp-for="NamaCustomer" class="form-control" />
+                            <span asp-validation-for="NamaCustomer" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Alamat <span class="text-danger">*</span></label>
+                            <textarea class="form-control" asp-for="Alamat"></textarea>
+                            <span asp-validation-for="Alamat" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col mb-3">
+                        <div class="form-group">
+                            <label>Jenis Customer <span class="text-danger">*</span></label>
+                            <select class="form-control" asp-for="JenisCustomer">
+                                <option value="">Pilih</option>
+                                <option value="B2B">B2B</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Marketplace">Marketplace</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col text-end mb-3">
+                        <button type="submit" class="btn btn-primary"> <i class="bi bi-save"></i> Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

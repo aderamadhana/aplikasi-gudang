@@ -1,5 +1,320 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
 }
+<h3 class="mb-4 fw-bold"> Master Lokasi</h3>
+
+<div class="card">
+    <div class="card-header p-3">
+        <div class="container-fluid px-0">
+            <div class="row g-2 align-items-center">
+                <!-- Filter -->
+                <div class="col-12 col-md-3">
+                    <button class="btn btn-outline-dark w-50" data-bs-toggle="modal" data-bs-target="#filter-data">
+                        <i class="bi bi-funnel"></i> Filter Data
+                    </button>
+                </div>
+
+                <!-- Actions -->
+                <div class="col-12 col-md-9">
+                    <div class="d-flex flex-wrap gap-2 justify-content-start justify-content-md-end">
+                        <a class="btn btn-outline-success" asp-controller="Lokasi" asp-action="Create">
+                            <i class="bi bi-plus-circle"></i> Tambah Data
+                        </a>
+                        <button class="btn btn-success" onclick="exportData()">
+                            <i class="bi bi-file-earmark-excel"></i> Export
+                        </button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#import-data">
+                            <i class="bi bi-file-earmark-arrow-up"></i> Import
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered table-striped align-middle" id="myTable">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th style="width: 10%;">No</th>
+                        <th>Nama Lokasi</th>
+                        <th>Alamat</th>
+                        <th>Jenis Lokasi</th>
+                        <th>Status</th>
+                        <th style="width: 10%;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- data via DataTables -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="filter-data" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Filter Data</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="filtered-status" id="filtered-status" class="form-control">
+                        <option value="true" selected>ENABLE</option>
+                        <option value="false">DISABLE</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="applyFilter()">Terapkan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="import-data" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Import Data</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <a class="btn btn-outline-success mb-2" href="/template_import/template_master_role.xlsx" )"
+                   download>
+                    <i class="bi bi-file-earmark-excel"></i> Download File
+                </a>
+                <div class="form-group">
+                    <label>Upload File (.xlsx)</label>
+                    <input type="file" id="file" class="form-control" name="file" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="importData()">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="alert-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1060;"></div>
+
+<!-- Template alert (akan dipanggil lewat JS) -->
+<script>
+    function loadtable(){
+        $('#myTable').DataTable().clear().destroy();
+        let status = $('#filtered-status').val();
+        $('#myTable').DataTable({
+              processing: true,
+              serverSide: true,
+              scrollX: false,
+              ajax: {
+                    url: '/Lokasi/GetLokasi?status='+status,
+                    type: 'POST',
+              },
+              columns: [
+                {
+                  data: null, // tidak ambil dari data API
+                  render: (data, type, row, meta) => meta.row + 1, // kasih nomor urut
+                  defaultContent: ''
+                },
+                { data: 'namaLokasi', defaultContent: '' },
+                { data: 'alamat', defaultContent: '' },
+                { data: 'jenisLokasi', defaultContent: '' },
+                {
+                  data: 'status',
+                  render: (d, type, row) => {
+                    return d
+                    ? `<span class="badge bg-success" onclick="changeStatus('${row.roleId}', false)">ENABLE</span>`
+                    : `<span class="badge bg-danger" onclick="changeStatus('${row.roleId}', true)">DISABLE</span>`;
+                  },
+                  defaultContent: '',
+                  className:'text-center'
+                },
+                {
+                  data: null,
+                  render: (d, type, row) => {
+                      const id   = row.roleId ?? '';
+                      const name = String(row.roleName ?? '').replace(/"/g, '&quot;');
+
+                      return row.status
+                          ? `<a href="/Lokasi/Edit/${id}"
+                               class="btn btn-sm btn-primary me-2"
+                               onclick="return confirmEdit(event, this)">
+                              <i class="bi bi-pencil"></i> Edit
+                            </a>`
+                        : `<button class="btn btn-sm me-2 btn-danger"
+                                   data-id="${id}" data-name="${name}"
+                                   onclick="hapusData('${id}','${name}')">
+                             <i class="bi bi-trash"></i> Hapus
+                           </button>`;
+                  },
+                  orderable: false,
+                  searchable: false,
+                  className: "text-center"
+                }
+              ]
+        });
+
+        $('#myTable').removeClass('dataTable no-footer');
+    }
+
+    // dipanggil saat klik "Terapkan"
+    function applyFilter() {
+      currentStatus = $('#filtered-status').val() ?? "";
+      loadtable();
+      $('#filter-data').modal('hide');
+      $('#myTable').DataTable().columns.adjust();
+
+    }
+
+    // panggil sekali saat halaman siap (tanpa filter)
+    $(function(){ loadtable(); });
+
+    // ubah status
+    function changeStatus(data_id, status){
+        let text_status = 'DISABLE';
+        if(status == true){
+            text_status = 'ENABLE';
+        }
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Ubah status Lokasi ID: ${data_id} (${text_status}) ?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+            // Contoh hit API pakai fetch
+            fetch(`/Lokasi/ChangeStatus/${data_id}?status=${status}`, {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success == true){
+                    showAlert(data.message, "success");
+                    loadtable();
+                }else{
+
+                    showAlert(data.message, "error");
+                    loadtable();
+                }
+            })
+            .catch(err => {
+                showAlert(err, "error");
+            });
+            }
+        });
+    }
+
+    function importData(){
+        var file = $("#file")[0];
+        if (!file.files.length) {
+            showAlert("Pilih file dulu.", "warning");
+            return;
+        }
+
+        var fd = new FormData();
+        fd.append("file", file.files[0]);
+
+        $.ajax({
+            url: "/Lokasi/Import",
+            type: "POST",
+            data: fd,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                if(data.success == true){
+                    showAlert("Import sukses. Inserted: " + data.inserted + ".", "success");
+                    $("#file").val("");
+                    $('#import-data').modal('hide');
+                    loadtable();
+                }else{
+                    showAlert(data.message, "error");
+                    loadtable();
+                }
+            },
+            error: function (xhr) {
+                showAlert(xhr, "error");
+            }
+        });
+    }
+
+    // hapus data
+    function hapusData(data_id, data_nama){
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Hapus data customer : ${data_nama} ?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+            // Contoh hit API pakai fetch
+            fetch(`/Lokasi/Delete/${data_id}`, {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success == true){
+                    showAlert(data.message, "success");
+                    loadtable();
+                }else{
+                    showAlert(data.message, "error");
+                    loadtable();
+                }
+            })
+            .catch(err => {
+                showAlert(err, "error");
+                console.error(err);
+            });
+            }
+        });
+    }
+
+    function exportData(){
+        const status = $('#filtered-status').val();
+
+        $.ajax({
+          url: '/Lokasi/Export',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ status }),
+          xhrFields: { responseType: 'blob' }, // terima file sebagai blob
+          success: function (data, statusText, xhr) {
+            // Ambil nama file dari Content-Disposition kalau ada
+            const dispo = xhr.getResponseHeader('Content-Disposition') || '';
+            let fileName = 'export_master_customer.xlsx';
+            const m = dispo.match(/filename\*=UTF-8''([^;]+)|filename="?([^"]+)"?/i);
+            if (m) fileName = decodeURIComponent(m[1] || m[2]);
+
+            // Buat link download sementara
+            const blob = new Blob([data], { type: xhr.getResponseHeader('Content-Type') || 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+          },
+          error: function (xhr) {
+              showAlert('Gagal export: ' + xhr.status + ' ' + xhr.statusText, "error");
+          }
+        });
+    }
+</script>
