@@ -1,4 +1,4 @@
-﻿@model gudang_net_baru.Models.Master.Supplier.SupplierDto
+﻿@model gudang_net_baru.Models.Master.Customer.CustomerDto
 @{
 }
 <div class="row">
@@ -6,19 +6,12 @@
         <div class="card">
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
-                    <h3>Tambah Supplier</h3>
+                    <h3>Edit Customer</h3>
                     <div class="col mb-3">
                         <div class="form-group">
-                            <label>Kode Supplier </label>
-                            <input type="text" class="form-control" asp-for="KodeSupplier" />
-                            <span asp-validation-for="KodeSupplier" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col mb-3">
-                        <div class="form-group">
-                            <label>Nama Supplier <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" asp-for="NamaSupplier" />
-                            <span asp-validation-for="NamaSupplier" class="text-danger"></span>
+                            <label>Nama Customer <span class="text-danger">*</span></label>
+                            <input type="text" asp-for="NamaCustomer" class="form-control" />
+                            <span asp-validation-for="NamaCustomer" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="col mb-3">
@@ -28,12 +21,16 @@
                             <span asp-validation-for="Alamat" class="text-danger"></span>
                         </div>
                     </div>
-
                     <div class="col mb-3">
                         <div class="form-group">
-                            <label>Term of Delivery</label>
-                            <textarea class="form-control" asp-for="TermOfDelivery"></textarea>
-                            <span asp-validation-for="TermOfDelivery" class="text-danger"></span>
+                            <label>Jenis Customer <span class="text-danger">*</span></label>
+                            <select class="form-control" asp-for="JenisCustomer">
+                                <option value="">Pilih</option>
+                                <option value="B2B">B2B</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Marketplace">Marketplace</option>
+                            </select>
+                            <span asp-validation-for="JenisCustomer" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="col text-end mb-3">

@@ -7,8 +7,7 @@ namespace gudang_net_baru.Models.Master.Supplier
     public class SupplierEntity
     {
         [Key]
-        [NotNull]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? IdSupplier { get; set; } = default!;
         [AllowNull]
         public string? KodeSupplier { get; set; }

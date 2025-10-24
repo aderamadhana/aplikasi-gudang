@@ -1,4 +1,6 @@
 ﻿using gudang_net_baru.Models.Master.Customer;
+using gudang_net_baru.Models.Master.Sku;
+using gudang_net_baru.Models.Master.Supplier;
 using gudang_net_baru.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -72,7 +74,40 @@ namespace gudang_net_baru.Controllers.Master
             {
                 return View(customerDto);
             }
+
+            var customer = new CustomerEntity()
+            {
+                NamaCustomer = customerDto.NamaCustomer,
+                Alamat = customerDto.Alamat,
+                JenisCustomer = customerDto.JenisCustomer,
+                Status = true,
+                CreatedAt = DateTime.Now,
+                CreatedBy = HttpContext.Session.GetString("UserId"),
+            };
+
+            context.MasterCustomer.Add(customer);
+            context.SaveChanges();
+
             return RedirectToAction("Index");
+        }
+        public IActionResult Edit(string id)
+        {
+            var customer = context.MasterCustomer.Find(id);
+            if (customer == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var customer_dto = new CustomerDto()
+            {
+                NamaCustomer = customer.NamaCustomer,
+                Alamat = customer.Alamat,
+                JenisCustomer = customer.JenisCustomer,
+            };
+
+            ViewData["Id"] = customer.IdCustomer;
+
+            return View(customer_dto);
         }
     }
 }

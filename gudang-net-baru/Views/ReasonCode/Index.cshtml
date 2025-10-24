@@ -1,6 +1,6 @@
 ﻿@{
 }
-<h3 class="mb-4 fw-bold"> Master ReasonCode</h3>
+<h3 class="mb-4 fw-bold"> Master Reason Code</h3>
 
 <div class="card">
     <div class="card-header p-3">
@@ -37,9 +37,9 @@
                 <thead class="table-primary text-center">
                     <tr>
                         <th style="width: 10%;">No</th>
-                        <th>Nama ReasonCode</th>
-                        <th>Alamat</th>
-                        <th>Jenis ReasonCode</th>
+                        <th>Adjustment</th>
+                        <th>Return</th>
+                        <th>Transfer</th>
                         <th>Status</th>
                         <th style="width: 10%;">Aksi</th>
                     </tr>
@@ -85,7 +85,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <a class="btn btn-outline-success mb-2" href="/template_import/template_master_role.xlsx" )"
+                <a class="btn btn-outline-success mb-2" href="/template_import/template_master_reason_code.xlsx" )"
                    download>
                     <i class="bi bi-file-earmark-excel"></i> Download File
                 </a>
@@ -123,15 +123,15 @@
                   render: (data, type, row, meta) => meta.row + 1, // kasih nomor urut
                   defaultContent: ''
                 },
-                { data: 'namaReasonCode', defaultContent: '' },
-                { data: 'alamat', defaultContent: '' },
-                { data: 'jenisReasonCode', defaultContent: '' },
+                { data: 'adjustment', defaultContent: '' },
+                { data: 'return', defaultContent: '' },
+                { data: 'transfer', defaultContent: '' },
                 {
                   data: 'status',
                   render: (d, type, row) => {
                     return d
-                    ? `<span class="badge bg-success" onclick="changeStatus('${row.roleId}', false)">ENABLE</span>`
-                    : `<span class="badge bg-danger" onclick="changeStatus('${row.roleId}', true)">DISABLE</span>`;
+                    ? `<span class="badge bg-success" onclick="changeStatus('${row.idReasonCode}', false)">ENABLE</span>`
+                    : `<span class="badge bg-danger" onclick="changeStatus('${row.idReasonCode}', true)">DISABLE</span>`;
                   },
                   defaultContent: '',
                   className:'text-center'
@@ -139,7 +139,7 @@
                 {
                   data: null,
                   render: (d, type, row) => {
-                      const id   = row.roleId ?? '';
+                      const id   = row.idReasonCode ?? '';
                       const name = String(row.roleName ?? '').replace(/"/g, '&quot;');
 
                       return row.status
@@ -184,7 +184,6 @@
         }
         Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: `Ubah status ReasonCode ID: ${data_id} (${text_status}) ?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Ya',
@@ -253,7 +252,6 @@
     function hapusData(data_id, data_nama){
         Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: `Hapus data customer : ${data_nama} ?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Ya',
@@ -297,7 +295,7 @@
           success: function (data, statusText, xhr) {
             // Ambil nama file dari Content-Disposition kalau ada
             const dispo = xhr.getResponseHeader('Content-Disposition') || '';
-            let fileName = 'export_master_customer.xlsx';
+            let fileName = 'export_master_reason_code.xlsx';
             const m = dispo.match(/filename\*=UTF-8''([^;]+)|filename="?([^"]+)"?/i);
             if (m) fileName = decodeURIComponent(m[1] || m[2]);
 

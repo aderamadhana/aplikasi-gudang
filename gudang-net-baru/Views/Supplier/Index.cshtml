@@ -37,9 +37,10 @@
                 <thead class="table-primary text-center">
                     <tr>
                         <th style="width: 10%;">No</th>
+                        <th>Kode Supplier</th>
                         <th>Nama Supplier</th>
                         <th>Alamat</th>
-                        <th>Jenis Supplier</th>
+                        <th>Term Of Delivery</th>
                         <th>Status</th>
                         <th style="width: 10%;">Aksi</th>
                     </tr>
@@ -123,15 +124,16 @@
                   render: (data, type, row, meta) => meta.row + 1, // kasih nomor urut
                   defaultContent: ''
                 },
+                { data: 'kodeSupplier', defaultContent: '' },
                 { data: 'namaSupplier', defaultContent: '' },
                 { data: 'alamat', defaultContent: '' },
-                { data: 'jenisSupplier', defaultContent: '' },
+                { data: 'termOfDelivery', defaultContent: '' },
                 {
                   data: 'status',
                   render: (d, type, row) => {
                     return d
-                    ? `<span class="badge bg-success" onclick="changeStatus('${row.roleId}', false)">ENABLE</span>`
-                    : `<span class="badge bg-danger" onclick="changeStatus('${row.roleId}', true)">DISABLE</span>`;
+                    ? `<span class="badge bg-success" onclick="changeStatus('${row.idSupplier}', false)">ENABLE</span>`
+                    : `<span class="badge bg-danger" onclick="changeStatus('${row.idSupplier}', true)">DISABLE</span>`;
                   },
                   defaultContent: '',
                   className:'text-center'
@@ -139,7 +141,7 @@
                 {
                   data: null,
                   render: (d, type, row) => {
-                      const id   = row.roleId ?? '';
+                      const id   = row.idSupplier ?? '';
                       const name = String(row.roleName ?? '').replace(/"/g, '&quot;');
 
                       return row.status
@@ -184,7 +186,6 @@
         }
         Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: `Ubah status Supplier ID: ${data_id} (${text_status}) ?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Ya',
@@ -253,7 +254,6 @@
     function hapusData(data_id, data_nama){
         Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: `Hapus data customer : ${data_nama} ?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Ya',

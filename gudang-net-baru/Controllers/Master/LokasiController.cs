@@ -1,5 +1,7 @@
 ﻿using gudang_net_baru.Models.Master.Ekspedisi;
 using gudang_net_baru.Models.Master.Lokasi;
+using gudang_net_baru.Models.Master.Sku;
+using gudang_net_baru.Models.Master.Supplier;
 using gudang_net_baru.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -48,6 +50,8 @@ namespace gudang_net_baru.Controllers.Master
                         .Select(r => new {
                             r.IdLokasi,
                             r.Warehouse,
+                            r.TipeLokasi,
+                            r.Kapasitas,
                             r.Status
                         })
                         .ToList();
@@ -71,7 +75,40 @@ namespace gudang_net_baru.Controllers.Master
             {
                 return View(lokasiDto);
             }
+
+            var lokasi = new LokasiEntity()
+            {
+                Warehouse = lokasiDto.Warehouse,
+                TipeLokasi = lokasiDto.TipeLokasi,
+                Kapasitas = lokasiDto.Kapasitas,
+                Status = true,
+                CreatedAt = DateTime.Now,
+                CreatedBy = HttpContext.Session.GetString("UserId")
+            };
+
+            context.MasterLokasi.Add(lokasi);
+            context.SaveChanges();
+
             return RedirectToAction("Index");
+        }
+        public IActionResult Edit(string id)
+        {
+            var lokasi = context.MasterLokasi.Find(id);
+            if (lokasi == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var lokasi_dto = new LokasiDto()
+            {
+                Warehouse = lokasi.Warehouse,
+                TipeLokasi = lokasi.TipeLokasi,
+                Kapasitas = lokasi.Kapasitas,
+            };
+
+            ViewData["Id"] = lokasi.IdLokasi;
+
+            return View(lokasi_dto);
         }
     }
 }

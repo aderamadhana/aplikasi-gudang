@@ -1,5 +1,7 @@
 ﻿using gudang_net_baru.Models.Master.Lokasi;
 using gudang_net_baru.Models.Master.ReasonCode;
+using gudang_net_baru.Models.Master.Sku;
+using gudang_net_baru.Models.Master.Supplier;
 using gudang_net_baru.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,6 +49,7 @@ namespace gudang_net_baru.Controllers.Master
                         .Take(length)
                         .Select(r => new {
                             r.IdReasonCode,
+                            r.Adjustment,
                             r.Transfer,
                             r.Return,
                             r.Status
@@ -73,7 +76,40 @@ namespace gudang_net_baru.Controllers.Master
             {
                 return View(reasonCodeDto);
             }
+
+            var reason = new ReasonCodeEntity()
+            {
+                Adjustment = reasonCodeDto.Adjustment,
+                Return = reasonCodeDto.Return,
+                Transfer = reasonCodeDto.Transfer,
+                Status = true,
+                CreatedAt = DateTime.Now,
+                CreatedBy = HttpContext.Session.GetString("UserId"),
+            };
+
+            context.MasterReasonCode.Add(reason);
+            context.SaveChanges();
+
             return RedirectToAction("Index");
+        }
+        public IActionResult Edit(string id)
+        {
+            var reason_code = context.MasterReasonCode.Find(id);
+            if (reason_code == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var reason_code_dto = new ReasonCodeDto()
+            {
+                Adjustment = reason_code.Adjustment,
+                Return = reason_code.Return,
+                Transfer = reason_code.Transfer,
+            };
+
+            ViewData["Id"] = reason_code.IdReasonCode;
+
+            return View(reason_code_dto);
         }
     }
 }

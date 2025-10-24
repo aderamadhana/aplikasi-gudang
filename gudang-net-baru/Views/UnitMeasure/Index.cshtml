@@ -1,6 +1,6 @@
 ﻿@{
 }
-<h3 class="mb-4 fw-bold"> Master UnitMeasure</h3>
+<h3 class="mb-4 fw-bold"> Master Unit Measure</h3>
 
 <div class="card">
     <div class="card-header p-3">
@@ -37,9 +37,10 @@
                 <thead class="table-primary text-center">
                     <tr>
                         <th style="width: 10%;">No</th>
-                        <th>Nama UnitMeasure</th>
-                        <th>Alamat</th>
-                        <th>Jenis UnitMeasure</th>
+                        <th>Nama Unit Measure</th>
+                        <th>Box</th>
+                        <th>Carton</th>
+                        <th>Conversion</th>
                         <th>Status</th>
                         <th style="width: 10%;">Aksi</th>
                     </tr>
@@ -123,15 +124,16 @@
                   render: (data, type, row, meta) => meta.row + 1, // kasih nomor urut
                   defaultContent: ''
                 },
-                { data: 'namaUnitMeasure', defaultContent: '' },
-                { data: 'alamat', defaultContent: '' },
-                { data: 'jenisUnitMeasure', defaultContent: '' },
+                { data: 'unitMeasureName', defaultContent: '' },
+                { data: 'box', defaultContent: '' },
+                { data: 'carton', defaultContent: '' },
+                { data: 'conversion', defaultContent: '' },
                 {
                   data: 'status',
                   render: (d, type, row) => {
                     return d
-                    ? `<span class="badge bg-success" onclick="changeStatus('${row.roleId}', false)">ENABLE</span>`
-                    : `<span class="badge bg-danger" onclick="changeStatus('${row.roleId}', true)">DISABLE</span>`;
+                    ? `<span class="badge bg-success" onclick="changeStatus('${row.idUnitMeasure}', false)">ENABLE</span>`
+                    : `<span class="badge bg-danger" onclick="changeStatus('${row.idUnitMeasure}', true)">DISABLE</span>`;
                   },
                   defaultContent: '',
                   className:'text-center'
@@ -139,7 +141,7 @@
                 {
                   data: null,
                   render: (d, type, row) => {
-                      const id   = row.roleId ?? '';
+                      const id   = row.idUnitMeasure ?? '';
                       const name = String(row.roleName ?? '').replace(/"/g, '&quot;');
 
                       return row.status
@@ -184,7 +186,6 @@
         }
         Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: `Ubah status UnitMeasure ID: ${data_id} (${text_status}) ?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Ya',
@@ -253,7 +254,6 @@
     function hapusData(data_id, data_nama){
         Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: `Hapus data customer : ${data_nama} ?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Ya',

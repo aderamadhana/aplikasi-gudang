@@ -7,8 +7,7 @@ namespace gudang_net_baru.Models.Master.Ekspedisi
     public class EkspedisiEntity
     {
         [Key]
-        [NotNull]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? IdEkspedisi { get; set; } = default!;
         [AllowNull]
         public string? NamaEkspedisi { get; set; }

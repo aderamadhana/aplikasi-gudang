@@ -1,4 +1,5 @@
-﻿using gudang_net_baru.Models.Master.Supplier;
+﻿using gudang_net_baru.Models.Master.Sku;
+using gudang_net_baru.Models.Master.Supplier;
 using gudang_net_baru.Models.Master.UnitMeasure;
 using gudang_net_baru.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +48,7 @@ namespace gudang_net_baru.Controllers.Master
                         .Take(length)
                         .Select(r => new {
                             r.IdUnitMeasure,
+                            r.UnitMeasureName,
                             r.Box,
                             r.Carton,
                             r.Conversion,
@@ -74,7 +76,45 @@ namespace gudang_net_baru.Controllers.Master
             {
                 return View(unitMeasureDto);
             }
+            var unitMeasure = new UnitMeasureEntity()
+            {
+                UnitMeasureName = unitMeasureDto.UnitMeasureName,
+                Ea = unitMeasureDto.Ea,
+                Box = unitMeasureDto.Box,
+                Carton = unitMeasureDto.Carton,
+                Pallet = unitMeasureDto.Pallet,
+                Conversion = unitMeasureDto.Conversion,
+                Status = true,
+                CreatedAt = DateTime.Now,
+                CreatedBy = HttpContext.Session.GetString("UserId")
+            };
+
+            context.MasterUnitMeasure.Add(unitMeasure);
+            context.SaveChanges();
+            
             return RedirectToAction("Index");
+        }
+        public IActionResult Edit(string id)
+        {
+            var unit_measure = context.MasterUnitMeasure.Find(id);
+            if(unit_measure == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var unit_measure_dto = new UnitMeasureDto()
+            {
+                UnitMeasureName = unit_measure.UnitMeasureName,
+                Ea = unit_measure.Ea,
+                Box = unit_measure.Box,
+                Carton = unit_measure.Carton,
+                Pallet = unit_measure.Pallet,
+                Conversion = unit_measure.Conversion,
+            };
+
+            ViewData["Id"] = unit_measure.IdUnitMeasure;
+
+            return View(unit_measure_dto);
         }
     }
 }

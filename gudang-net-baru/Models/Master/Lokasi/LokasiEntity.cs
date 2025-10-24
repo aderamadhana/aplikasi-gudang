@@ -7,8 +7,7 @@ namespace gudang_net_baru.Models.Master.Lokasi
     public class LokasiEntity
     {
         [Key]
-        [NotNull]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? IdLokasi { get; set; } = default!;
         [AllowNull]
         public string? Warehouse { get; set; }

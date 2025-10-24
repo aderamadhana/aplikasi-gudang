@@ -13,7 +13,6 @@ namespace gudang_net_baru.Models.Master.Sku
         public string? Deskripsi { get; set; }
         [Required]
         public string? UnitMeasureId { get; set; }
-        [Required]
         public string? UnitMeasureName { get; set; }
         [Required]
         public int? Dimensi { get; set; }

@@ -6,6 +6,8 @@ namespace gudang_net_baru.Models.Master.UnitMeasure
 {
     public class UnitMeasureDto
     {
+        public string? IdUnitMeasure { get; set; } = string.Empty;
+        public string? UnitMeasureName { get; set; }
         public int? Ea { get; set; }
         public int? Box { get; set; }
         public int? Carton { get; set; }

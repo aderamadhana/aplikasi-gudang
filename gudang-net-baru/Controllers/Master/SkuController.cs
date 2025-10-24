@@ -1,10 +1,16 @@
 ﻿using gudang_net_baru.Models.Master.ReasonCode;
 using gudang_net_baru.Models.Master.Sku;
+using gudang_net_baru.Models.Master.Supplier;
 using gudang_net_baru.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace gudang_net_baru.Controllers.Master
 {
+    [Authorize]
     public class SkuController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -62,18 +68,94 @@ namespace gudang_net_baru.Controllers.Master
                 data
             });
         }
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var list_unit_measure = await context.MasterUnitMeasure
+                .Where(m => m.Status == true)
+                .Select(m => new {
+                    m.IdUnitMeasure,
+                    m.UnitMeasureName,
+                    m.Status
+                })
+                .ToListAsync();
+
+            ViewBag.UnitMeasure = list_unit_measure;
             return View();
         }
         [HttpPost]
-        public IActionResult Create(SkuDto skuDto)
+        public async Task<IActionResult> Create(SkuDto skuDto)
         {
             if (!ModelState.IsValid)
             {
+                var list_unit_measure = await context.MasterUnitMeasure
+                .Where(m => m.Status == true)
+                .Select(m => new {
+                    m.IdUnitMeasure,
+                    m.UnitMeasureName,
+                    m.Status
+                })
+                .ToListAsync();
+
+                ViewBag.UnitMeasure = list_unit_measure;
                 return View(skuDto);
             }
+
+            var unit_measure = context.MasterUnitMeasure.Find(skuDto.UnitMeasureId);
+
+            var sku = new SkuEntity()
+            {
+                KodeSku = skuDto.KodeSku,
+                NamaBarang = skuDto.NamaBarang,
+                Deskripsi = skuDto.Deskripsi,
+                UnitMeasureId = skuDto.UnitMeasureId,
+                UnitMeasureName = unit_measure?.UnitMeasureName,
+                Dimensi = skuDto.Dimensi,
+                JenisBarang = skuDto.JenisBarang,
+                LotTracking = skuDto.LotTracking,
+                Status = true,
+                CreatedAt = DateTime.Now,
+                CreatedBy = HttpContext.Session.GetString("UserId")
+            };
+
+            context.MasterSku.Add(sku);
+            context.SaveChanges();
+
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Edit(string id)
+        {
+            var sku = context.MasterSku.Find(id);
+            if (sku == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+
+            var sku_dto = new SkuDto()
+            {
+                KodeSku = sku.KodeSku,
+                NamaBarang = sku.NamaBarang,
+                Deskripsi = sku.Deskripsi,
+                UnitMeasureId = sku.UnitMeasureId,
+                Dimensi = sku.Dimensi,
+                JenisBarang = sku.JenisBarang,
+                LotTracking = sku.LotTracking,
+            };
+
+            ViewData["Id"] = sku.IdSku;
+
+            var list_unit_measure = await context.MasterUnitMeasure
+                .Where(m => m.Status == true)
+                .Select(m => new {
+                    m.IdUnitMeasure,
+                    m.UnitMeasureName,
+                    m.Status
+                })
+                .ToListAsync();
+
+            ViewBag.UnitMeasure = list_unit_measure;
+            return View(sku_dto);
         }
     }
 }

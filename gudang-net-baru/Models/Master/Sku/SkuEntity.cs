@@ -7,8 +7,7 @@ namespace gudang_net_baru.Models.Master.Sku
     public class SkuEntity
     {
         [Key]
-        [NotNull]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? IdSku { get; set; } = default!;
         [AllowNull]
         public string? KodeSku { get; set; }

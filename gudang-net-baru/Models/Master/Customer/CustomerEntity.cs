@@ -7,8 +7,7 @@ namespace gudang_net_baru.Models.Master.Customer
     public class CustomerEntity
     {
         [Key]
-        [NotNull]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? IdCustomer { get; set; } = default!;
         [AllowNull]
         public string? NamaCustomer { get; set; }

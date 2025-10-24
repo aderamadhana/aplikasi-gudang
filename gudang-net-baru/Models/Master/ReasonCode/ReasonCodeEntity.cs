@@ -7,8 +7,7 @@ namespace gudang_net_baru.Models.Master.ReasonCode
     public class ReasonCodeEntity
     {
         [Key]
-        [NotNull]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? IdReasonCode { get; set; } = default!;
         [AllowNull]
         public string? Adjustment { get; set; }

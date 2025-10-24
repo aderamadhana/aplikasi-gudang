@@ -1,5 +1,7 @@
 ﻿using gudang_net_baru.Models.Master.Customer;
 using gudang_net_baru.Models.Master.Ekspedisi;
+using gudang_net_baru.Models.Master.Sku;
+using gudang_net_baru.Models.Master.Supplier;
 using gudang_net_baru.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.CompilerServices;
@@ -75,7 +77,40 @@ namespace gudang_net_baru.Controllers.Master
             {
                 return View(ekspedisiDto);
             }
+
+            var ekspedisi = new EkspedisiEntity()
+            {
+                NamaEkspedisi = ekspedisiDto.NamaEkspedisi,
+                SlaPengiriman = ekspedisiDto.SlaPengiriman,
+                JenisLayanan = ekspedisiDto.JenisLayanan,
+                Status = true,
+                CreatedAt = DateTime.Now,
+                CreatedBy = HttpContext.Session.GetString("UserId"),
+            };
+
+            context.MasterEkspedisi.Add(ekspedisi);
+            context.SaveChanges();
+
             return RedirectToAction("Index");
+        }
+        public IActionResult Edit(string id)
+        {
+            var ekspedisi = context.MasterEkspedisi.Find(id);
+            if (ekspedisi == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var ekspedisi_dto = new EkspedisiDto()
+            {
+                NamaEkspedisi = ekspedisi.NamaEkspedisi,
+                SlaPengiriman = ekspedisi.SlaPengiriman,
+                JenisLayanan = ekspedisi.JenisLayanan,
+            };
+
+            ViewData["Id"] = ekspedisi.IdEkspedisi;
+
+            return View(ekspedisi_dto);
         }
     }
 }

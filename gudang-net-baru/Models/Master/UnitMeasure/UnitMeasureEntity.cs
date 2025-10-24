@@ -7,9 +7,10 @@ namespace gudang_net_baru.Models.Master.UnitMeasure
     public class UnitMeasureEntity
     {
         [Key]
-        [NotNull]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? IdUnitMeasure { get; set; } = default!;
+        [AllowNull]
+        public string? UnitMeasureName { get; set; }
         [AllowNull]
         public int? Ea { get; set; }
         [AllowNull]
