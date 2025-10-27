@@ -110,5 +110,83 @@ namespace gudang_net_baru.Controllers.Master
 
             return View(lokasi_dto);
         }
+
+        [HttpPost]
+        public IActionResult Edit(string id, LokasiDto lokasiDto)
+        {
+            var cek = context.MasterLokasi.Find(id);
+            if (cek == null)
+            {
+                return RedirectToAction("Index");
+            }
+            if (!ModelState.IsValid)
+            {
+                return View(lokasiDto);
+            }
+
+
+            cek.Warehouse = lokasiDto.Warehouse;
+            cek.TipeLokasi = lokasiDto.TipeLokasi;
+            cek.Kapasitas = lokasiDto.Kapasitas;
+            cek.Status = true;
+            cek.UpdatedAt = DateTime.Now;
+            cek.UpdatedBy = HttpContext.Session.GetString("UserId");
+            
+            context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult ChangeStatus(string id, bool status)
+        {
+            var cek = context.MasterLokasi.Find(id);
+            if (cek == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Gagal ubah status!"
+                });
+            }
+
+            cek.Status = status;
+            cek.UpdatedAt = DateTime.Now;
+            cek.UpdatedBy = HttpContext.Session.GetString("UserId");
+
+            context.SaveChanges();
+
+            return Json(new
+            {
+                success = true,
+                message = "Berhasil ubah status!"
+            });
+        }
+
+        [HttpPost]
+        public IActionResult Delete(string id)
+        {
+            var cek = context.MasterLokasi.Find(id);
+            if (cek == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Gagal hapus data!"
+                });
+            }
+
+            cek.DeletedAt = DateTime.Now;
+            cek.DeletedBy = HttpContext.Session.GetString("UserId");
+
+            context.SaveChanges();
+
+            return Json(new
+            {
+                success = true,
+                message = "Berhasil hapus data!"
+            });
+        }
+
     }
 }

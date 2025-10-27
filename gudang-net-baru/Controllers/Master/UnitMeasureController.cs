@@ -116,5 +116,87 @@ namespace gudang_net_baru.Controllers.Master
 
             return View(unit_measure_dto);
         }
+        [HttpPost]
+        public IActionResult Edit(string id, UnitMeasureDto unitMeasureDto)
+        {
+            var cek = context.MasterUnitMeasure.Find(id);
+            if (cek == null)
+            {
+                return RedirectToAction("Index");
+            }
+            if (!ModelState.IsValid)
+            {
+                return View(unitMeasureDto);
+            }
+
+            cek.UnitMeasureName = unitMeasureDto.UnitMeasureName;
+            cek.Ea = unitMeasureDto.Ea;
+            cek.Box = unitMeasureDto.Box;
+            cek.Carton = unitMeasureDto.Carton;
+            cek.Pallet = unitMeasureDto.Pallet;
+            cek.Conversion = unitMeasureDto.Conversion;
+            cek.Status = true;
+            cek.UpdatedAt = DateTime.Now;
+            cek.UpdatedBy = HttpContext.Session.GetString("UserId");
+            
+
+            context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult ChangeStatus(string id, bool status)
+        {
+            var cek = context.MasterUnitMeasure.Find(id);
+            if (cek == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Gagal ubah status!"
+                });
+            }
+
+            cek.Status = status;
+            cek.UpdatedAt = DateTime.Now;
+            cek.UpdatedBy = HttpContext.Session.GetString("UserId");
+
+
+            context.SaveChanges();
+
+            return Json(new
+            {
+                success = true,
+                message = "Berhasil ubah status!"
+            });
+        }
+
+        [HttpPost]
+        public IActionResult Delete(string id)
+        {
+            var cek = context.MasterUnitMeasure.Find(id);
+            if (cek == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Gagal hapus data!"
+                });
+            }
+
+            cek.DeletedAt = DateTime.Now;
+            cek.DeletedBy = HttpContext.Session.GetString("UserId");
+
+
+            context.SaveChanges();
+
+            return Json(new
+            {
+                success = true,
+                message = "Berhasil hapus data!"
+            });
+        }
+
     }
 }

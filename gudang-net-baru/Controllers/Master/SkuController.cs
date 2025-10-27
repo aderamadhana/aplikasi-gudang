@@ -157,5 +157,99 @@ namespace gudang_net_baru.Controllers.Master
             ViewBag.UnitMeasure = list_unit_measure;
             return View(sku_dto);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(string id, SkuDto skuDto)
+        {
+            var cek = context.MasterSku.Find(id);
+            if (cek == null)
+            {
+                return RedirectToAction("Index");
+            }
+            if (!ModelState.IsValid)
+            {
+                var list_unit_measure = await context.MasterUnitMeasure
+                .Where(m => m.Status == true)
+                .Select(m => new {
+                    m.IdUnitMeasure,
+                    m.UnitMeasureName,
+                    m.Status
+                })
+                .ToListAsync();
+
+                ViewBag.UnitMeasure = list_unit_measure;
+                return View(skuDto);
+            }
+
+            var unit_measure = context.MasterUnitMeasure.Find(skuDto.UnitMeasureId);
+
+
+            cek.KodeSku = skuDto.KodeSku;
+            cek.NamaBarang = skuDto.NamaBarang;
+            cek.Deskripsi = skuDto.Deskripsi;
+            cek.UnitMeasureId = skuDto.UnitMeasureId;
+            cek.UnitMeasureName = unit_measure?.UnitMeasureName;
+            cek.Dimensi = skuDto.Dimensi;
+            cek.JenisBarang = skuDto.JenisBarang;
+            cek.LotTracking = skuDto.LotTracking;
+            cek.Status = true;
+            cek.CreatedAt = DateTime.Now;
+            cek.CreatedBy = HttpContext.Session.GetString("UserId");
+            
+            context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult ChangeStatus(string id, bool status)
+        {
+            var cek = context.MasterSku.Find(id);
+            if (cek == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Gagal ubah status!"
+                });
+            }
+
+            cek.Status = status;
+            cek.CreatedAt = DateTime.Now;
+            cek.CreatedBy = HttpContext.Session.GetString("UserId");
+
+            context.SaveChanges();
+
+            return Json(new
+            {
+                success = true,
+                message = "Berhasil ubah status!"
+            });
+        }
+
+        [HttpPost]
+        public IActionResult Delete(string id)
+        {
+            var cek = context.MasterSku.Find(id);
+            if (cek == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Gagal hapus data!"
+                });
+            }
+
+            cek.DeletedAt = DateTime.Now;
+            cek.DeletedBy = HttpContext.Session.GetString("UserId");
+
+            context.SaveChanges();
+
+            return Json(new
+            {
+                success = true,
+                message = "Berhasil hapus data!"
+            });
+        }
     }
 }
