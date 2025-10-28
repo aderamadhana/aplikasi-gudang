@@ -39,7 +39,7 @@ namespace gudang_net_baru.Controllers.Master
             var filteredQuery = baseQuery;
             if (!string.IsNullOrWhiteSpace(search))
                 filteredQuery = filteredQuery.Where(r =>
-                    r.Adjustment.Contains(search));
+                    r.Kategori.Contains(search));
 
             var recordsFiltered = filteredQuery.Count();
 
@@ -49,9 +49,9 @@ namespace gudang_net_baru.Controllers.Master
                         .Take(length)
                         .Select(r => new {
                             r.IdReasonCode,
-                            r.Adjustment,
-                            r.Transfer,
-                            r.Return,
+                            r.Kategori,
+                            r.ReasonCode,
+                            r.Deskripsi,
                             r.Status
                         })
                         .ToList();
@@ -79,9 +79,9 @@ namespace gudang_net_baru.Controllers.Master
 
             var reason = new ReasonCodeEntity()
             {
-                Adjustment = reasonCodeDto.Adjustment,
-                Return = reasonCodeDto.Return,
-                Transfer = reasonCodeDto.Transfer,
+                Kategori = reasonCodeDto.Kategori,
+                ReasonCode = reasonCodeDto.ReasonCode,
+                Deskripsi = reasonCodeDto.Deskripsi,
                 Status = true,
                 CreatedAt = DateTime.Now,
                 CreatedBy = HttpContext.Session.GetString("UserId"),
@@ -102,9 +102,9 @@ namespace gudang_net_baru.Controllers.Master
 
             var reason_code_dto = new ReasonCodeDto()
             {
-                Adjustment = reason_code.Adjustment,
-                Return = reason_code.Return,
-                Transfer = reason_code.Transfer,
+                Kategori = reason_code.Kategori,
+                ReasonCode = reason_code.ReasonCode,
+                Deskripsi = reason_code.Deskripsi,
             };
 
             ViewData["Id"] = reason_code.IdReasonCode;
@@ -126,9 +126,9 @@ namespace gudang_net_baru.Controllers.Master
             }
 
 
-            cek.Adjustment = reasonCodeDto.Adjustment;
-            cek.Return = reasonCodeDto.Return;
-            cek.Transfer = reasonCodeDto.Transfer;
+            cek.Kategori = reasonCodeDto.Kategori;
+            cek.ReasonCode = reasonCodeDto.ReasonCode;
+            cek.Deskripsi = reasonCodeDto.Deskripsi;
             cek.Status = true;
             cek.UpdatedAt = DateTime.Now;
             cek.UpdatedBy = HttpContext.Session.GetString("UserId");

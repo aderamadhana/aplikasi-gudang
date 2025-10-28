@@ -9,23 +9,28 @@
                     <h3>Edit Reason Code</h3>
                     <div class="col mb-3">
                         <div class="form-group">
-                            <label>Adjustment</label>
-                            <textarea class="form-control" asp-for="Adjustment"></textarea>
-                            <span asp-validation-for="Adjustment" class="text-danger"></span>
+                            <label>Kategori</label>
+                            <select class="form-control" asp-for="Kategori">
+                                <option>Pilih</option>
+                                <option value="Adjustment">Adjustment</option>
+                                <option value="Return">Return</option>
+                                <option value="Transfer">Transfer</option>
+                            </select>
+                            <span asp-validation-for="Kategori" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="col mb-3">
                         <div class="form-group">
-                            <label>Return</label>
-                            <textarea class="form-control" asp-for="Return"></textarea>
-                            <span asp-validation-for="Return" class="text-danger"></span>
+                            <label>Reason Code</label>
+                            <textarea class="form-control" asp-for="ReasonCode"></textarea>
+                            <span asp-validation-for="ReasonCode" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="col mb-3">
                         <div class="form-group">
-                            <label>Transfer </label>
-                            <textarea class="form-control" asp-for="Transfer"></textarea>
-                            <span asp-validation-for="Transfer" class="text-danger"></span>
+                            <label>Deskripsi </label>
+                            <textarea class="form-control" asp-for="Deskripsi"></textarea>
+                            <span asp-validation-for="Deskripsi" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="col text-end mb-3">

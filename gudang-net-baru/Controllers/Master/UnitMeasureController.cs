@@ -49,8 +49,7 @@ namespace gudang_net_baru.Controllers.Master
                         .Select(r => new {
                             r.IdUnitMeasure,
                             r.UnitMeasureName,
-                            r.Box,
-                            r.Carton,
+                            r.Deskripsi,
                             r.Conversion,
                             r.Status
                         })
@@ -79,10 +78,7 @@ namespace gudang_net_baru.Controllers.Master
             var unitMeasure = new UnitMeasureEntity()
             {
                 UnitMeasureName = unitMeasureDto.UnitMeasureName,
-                Ea = unitMeasureDto.Ea,
-                Box = unitMeasureDto.Box,
-                Carton = unitMeasureDto.Carton,
-                Pallet = unitMeasureDto.Pallet,
+                Deskripsi = unitMeasureDto.Deskripsi,
                 Conversion = unitMeasureDto.Conversion,
                 Status = true,
                 CreatedAt = DateTime.Now,
@@ -105,10 +101,7 @@ namespace gudang_net_baru.Controllers.Master
             var unit_measure_dto = new UnitMeasureDto()
             {
                 UnitMeasureName = unit_measure.UnitMeasureName,
-                Ea = unit_measure.Ea,
-                Box = unit_measure.Box,
-                Carton = unit_measure.Carton,
-                Pallet = unit_measure.Pallet,
+                Deskripsi = unit_measure.Deskripsi,
                 Conversion = unit_measure.Conversion,
             };
 
@@ -130,10 +123,7 @@ namespace gudang_net_baru.Controllers.Master
             }
 
             cek.UnitMeasureName = unitMeasureDto.UnitMeasureName;
-            cek.Ea = unitMeasureDto.Ea;
-            cek.Box = unitMeasureDto.Box;
-            cek.Carton = unitMeasureDto.Carton;
-            cek.Pallet = unitMeasureDto.Pallet;
+            cek.Deskripsi = unitMeasureDto.Deskripsi;
             cek.Conversion = unitMeasureDto.Conversion;
             cek.Status = true;
             cek.UpdatedAt = DateTime.Now;

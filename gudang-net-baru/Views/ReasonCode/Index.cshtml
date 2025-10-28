@@ -37,9 +37,9 @@
                 <thead class="table-primary text-center">
                     <tr>
                         <th style="width: 10%;">No</th>
-                        <th>Adjustment</th>
-                        <th>Return</th>
-                        <th>Transfer</th>
+                        <th>Kategori</th>
+                        <th>Reason Code</th>
+                        <th>Deskripsi</th>
                         <th>Status</th>
                         <th style="width: 10%;">Aksi</th>
                     </tr>
@@ -123,9 +123,9 @@
                   render: (data, type, row, meta) => meta.row + 1, // kasih nomor urut
                   defaultContent: ''
                 },
-                { data: 'adjustment', defaultContent: '' },
-                { data: 'return', defaultContent: '' },
-                { data: 'transfer', defaultContent: '' },
+                { data: 'kategori', defaultContent: '' },
+                { data: 'reasonCode', defaultContent: '' },
+                { data: 'deskripsi', defaultContent: '' },
                 {
                   data: 'status',
                   render: (d, type, row) => {

@@ -98,7 +98,22 @@
     </div>
 </div>
 <script>
+    
+
     $(function () {
+        function toggleHiddenItems() {
+            if ($("#tipe_menu").val() === "label") {
+                $(".hidden_items").show();
+            } else {
+                $(".hidden_items").show();
+            }
+
+            console.log($("#tipe_menu").val());
+        }
+
+        // Cek value awal saat halaman pertama kali dimuat
+        toggleHiddenItems();
+
         $(".hidden_items").hide();
         $("#tipe_menu").on("change", function () {
             if ($(this).val() === "label") {

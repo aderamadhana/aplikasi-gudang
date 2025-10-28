@@ -68,7 +68,7 @@
                     <button class="submenu-toggle" type="button"
                             aria-expanded="@(isOpen ? "true" : "false")"
                             aria-controls="@submenuId">
-                        <i class="bi bi-send-check"></i> @menu_items.MenuName
+                        <i class="bi @menu_items.MenuIcon"></i> @menu_items.MenuName
                         <span class="arrow"><i class="bi bi-caret-down-fill"></i></span>
                     </button>
 
@@ -108,30 +108,63 @@
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Tutup"></button>
     </div>
     <div class="offcanvas-body">
-        <div class="nav-section">Home</div>
-        <a class="nav-link @(controller == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-grid-1x2"></i> Dashboard</a>
-        <div class="nav-section">Master dan Konfigurasi</div>
-        <div class="has-submenu @(controller == "Role" || controller == "User" || controller == "Menu" ? "is-open" : "")">
-            <button class="submenu-toggle" type="button" aria-expanded="false" aria-controls="konfigurasi">
-                <i class="bi bi-send-check"></i> Konfigurasi
-                <span class="arrow"><i class="bi bi-caret-down-fill"></i></span>
-            </button>
-            <div class="submenu @(controller == "Role" || controller == "User" || controller == "Menu" ? "is-open" : "")" id="konfigurasi">
-                <a class="nav-link @(controller == "User" ? "active" : "")" asp-area="" asp-controller="User" asp-action="Index">User</a>
-                <a class="nav-link @(controller == "Role" ? "active" : "")" asp-area="" asp-controller="Role" asp-action="Index">Role</a>
-                <a class="nav-link @(controller == "Menu" ? "active" : "")" asp-area="" asp-controller="Menu" asp-action="Index">Menu</a>
-            </div>
+        <div class="nav-section">
+            Ganti Role
         </div>
+        <select id="roleSelectMinimize" class="form-select form-select-sm text-uppercase fw-bold">
+            @foreach (var role in roles)
+            {
+                <option value="@role" selected="@(role == session_role)">
+                    @role.ToUpper()
+                </option>
+            }
+        </select>
+        @foreach (var menu_items in menu)
+        {
+            @if (menu_items.MenuType == "label")
+            {
+                <div class="nav-section">@menu_items.MenuName</div>
+            }
+            else if (menu_items.Children.Any())
+            {
+                // parent with submenu
+                var isOpen = menu_items.Children.Any(c => IsActive(c.ControllerName, controller));
+                var submenuId = $"submenu_{menu_items.IdMenu}";
 
-        <div class="has-submenu">
-            <button class="submenu-toggle" type="button" aria-expanded="true" aria-controls="master">
-                <i class="bi bi-fingerprint"></i> Master
-                <span class="arrow"><i class="bi bi-caret-down-fill"></i></span>
-            </button>
-            <div class="submenu" id="master">
-                <a class="nav-link" href="#">Barang</a>
-            </div>
-        </div>
+                <div class="has-submenu @(isOpen ? "is-open" : "")">
+                    <button class="submenu-toggle" type="button"
+                            aria-expanded="@(isOpen ? "true" : "false")"
+                            aria-controls="@submenuId">
+                        <i class="bi @menu_items.MenuIcon"></i> @menu_items.MenuName
+                        <span class="arrow"><i class="bi bi-caret-down-fill"></i></span>
+                    </button>
+
+                    <div class="submenu @(isOpen ? "is-open" : "")" id="@submenuId">
+                        @foreach (var child in menu_items.Children.OrderBy(c => c.Urutan))
+                        {
+                            var childCtrl = ControllerOf(child.ControllerName);
+                            <a class="nav-link @(IsActive(child.ControllerName, controller) ? "active" : "")"
+                               asp-area=""
+                               asp-controller="@childCtrl"
+                               asp-action="Index">
+                                @child.MenuName
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                // single link (no children)
+                var linkCtrl = ControllerOf(menu_items.ControllerName);
+                <a class="nav-link @(IsActive(menu_items.MenuName, controller) ? "active" : "")"
+                   asp-area=""
+                   asp-controller="@linkCtrl"
+                   asp-action="Index">
+                    <i class="bi bi-grid-1x2"></i> @menu_items.MenuName
+                </a>
+            }
+        }
     </div>
 </div>
 <script>
@@ -141,6 +174,18 @@
         $.post('/Login/SetRoleSession', { role: selectedRole }, function () {
             showAlert("Role berhasil diganti!","success");
            
+            setTimeout(function () {
+                location.reload();
+            }, 1000); // reload setelah 1 detik
+        });
+    });
+    
+    $("#roleSelectMinimize").on("change", function () {
+        var selectedRole = $(this).val();
+
+        $.post('/Login/SetRoleSession', { role: selectedRole }, function () {
+            showAlert("Role berhasil diganti!","success");
+
             setTimeout(function () {
                 location.reload();
             }, 1000); // reload setelah 1 detik

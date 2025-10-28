@@ -56,6 +56,7 @@ namespace gudang_net_baru.Controllers
                         m.MenuName,
                         m.MenuType,
                         m.ParentId,
+                        m.MenuIcon,
                         m.Urutan,
                         ControllerName = m.ControllerName ?? "",
                         ControllerFunction = m.ControllerFunction ?? "",
@@ -67,6 +68,7 @@ namespace gudang_net_baru.Controllers
                                 c.MenuName,
                                 c.MenuType,
                                 c.ParentId,
+                                c.MenuIcon,
                                 ControllerName = c.ControllerName ?? "",
                                 ControllerFunction = c.ControllerFunction ?? "",
                                 c.Urutan,
@@ -126,8 +128,11 @@ namespace gudang_net_baru.Controllers
                         m.IdMenu,
                         m.MenuName,
                         m.MenuType,
+                        m.MenuIcon,
                         m.ParentId,
                         m.Urutan,
+                        ControllerName = m.ControllerName ?? "",
+                        ControllerFunction = m.ControllerFunction ?? "",
                         Status = m.Status ?? false,
                         Children = context.Menu
                             .Where(c => c.ParentId == m.IdMenu && c.Status == true && c.MenuType == "menu" && c.RoleId == roleIds.First())
@@ -136,6 +141,9 @@ namespace gudang_net_baru.Controllers
                                 c.MenuName,
                                 c.MenuType,
                                 c.ParentId,
+                                c.MenuIcon,
+                                ControllerName = c.ControllerName ?? "",
+                                ControllerFunction = c.ControllerFunction ?? "",
                                 c.Urutan,
                                 Status = c.Status ?? false
                             })

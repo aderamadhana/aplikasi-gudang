@@ -1,5 +1,6 @@
 ﻿using gudang_net_baru.Models;
 using gudang_net_baru.Models.Konfigurasi.Menu;
+using gudang_net_baru.Models.Master.Lokasi;
 using gudang_net_baru.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -193,8 +194,21 @@ namespace gudang_net_baru.Controllers
             return View();
         }
 
-        public async Task<IActionResult> EditAsync()
+        public async Task<IActionResult> EditAsync(string id)
         {
+            var menu = await context.Menu.AsNoTracking()
+                .Where(m => m.IdMenu == id)
+                .Select(m => new { m.IdMenu, m.MenuIcon, m.RoleId, m.Urutan, m.MenuName, m.MenuType,
+                    ControllerName = (string?)m.ControllerName,
+                    ControllerFunction = (string?)m.ControllerFunction,
+                    ParentId = (string?)m.ParentId,
+                })
+                .FirstOrDefaultAsync();
+            return Json(menu);
+            if (menu == null)
+            {
+                return RedirectToAction("Index");
+            }
             var list_controller = adp.ActionDescriptors.Items
                .OfType<ControllerActionDescriptor>()
                .Select(d => d.ControllerTypeInfo.Name.Replace("Controller", ""))
@@ -217,6 +231,22 @@ namespace gudang_net_baru.Controllers
                     m.Status
                 })
                 .ToListAsync();
+
+            
+
+            var menu_dto = new MenuDto()
+            {
+                MenuType = menu?.MenuType,
+                RoleId = menu?.RoleId,
+                MenuName = menu?.MenuName,
+                MenuIcon = menu?.MenuIcon,
+                ControllerName = menu?.ControllerName,
+                ControllerFunction = menu?.ControllerFunction,
+                ParentId = menu?.ParentId,
+                Urutan = menu?.Urutan ?? 0
+            };
+
+            ViewData["Id"] = menu?.IdMenu;
 
             ViewBag.ListController = list_controller;
             ViewBag.ListRole = list_role;

@@ -11,21 +11,21 @@ namespace gudang_net_baru.Models.Konfigurasi.Menu
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string? IdMenu { get; set; } = default!;
         [AllowNull]
-        public string MenuName { get; set; }
+        public string MenuName { get; set; } = null;
         [AllowNull]
-        public string ControllerName { get; set; }
+        public string ControllerName { get; set; } = null;
         [AllowNull]
-        public string ControllerFunction { get; set; }
+        public string ControllerFunction { get; set; } = null;
         [AllowNull]
-        public string? MenuType { get; set; }
+        public string? MenuType { get; set; } = null;
         [AllowNull]
-        public string? ParentId {  get; set; }
+        public string? ParentId {  get; set; } = null;
         [AllowNull]
-        public string? MenuIcon { get; set; }
+        public string? MenuIcon { get; set; } = null;
         [AllowNull]
-        public string? RoleId { get; set; }
+        public string? RoleId { get; set; } = null;
         [AllowNull]
-        public bool? Status { get; set; }
+        public bool? Status { get; set; } = null;
         [AllowNull]
         public DateTime? CreatedAt { get; set; }
         [AllowNull]
@@ -39,6 +39,6 @@ namespace gudang_net_baru.Models.Konfigurasi.Menu
         [AllowNull]
         public string? DeletedBy { get; set; }
         [AllowNull]
-        public int Urutan { get; set; }
+        public int? Urutan { get; set; }
     }
 }

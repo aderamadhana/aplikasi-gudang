@@ -12,15 +12,9 @@ namespace gudang_net_baru.Models.Master.UnitMeasure
         [AllowNull]
         public string? UnitMeasureName { get; set; }
         [AllowNull]
-        public int? Ea { get; set; }
+        public string? Deskripsi { get; set; }
         [AllowNull]
-        public int? Box { get; set; }
-        [AllowNull]
-        public int? Carton { get; set; }
-        [AllowNull]
-        public int? Pallet { get; set; }
-        [AllowNull]
-        public int? Conversion { get; set; }
+        public string? Conversion { get; set; }
         [AllowNull]
         public bool? Status { get; set; }
         [AllowNull]

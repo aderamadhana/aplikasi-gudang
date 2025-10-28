@@ -8,13 +8,13 @@ namespace gudang_net_baru.Models.Konfigurasi.Menu
         public string? ControllerFunction { get; set; } = string.Empty;
         public string? MenuIcon { get; set; } = string.Empty;
         [Required]
-        public string MenuName { get; set; } = string.Empty;
+        public string? MenuName { get; set; } = string.Empty;
         [Required]
-        public string MenuType { get; set; } = string.Empty;
+        public string? MenuType { get; set; } = string.Empty;
         public string? ParentId { get; set; } = string.Empty;
         [Required]
-        public string RoleId { get; set; } = string.Empty;
-        public bool Status { get; set; }
+        public string? RoleId { get; set; } = string.Empty;
+        public bool? Status { get; set; }
         public DateTime? CreatedAt { get; set; }
         public string? CreatedBy { get; set; } = string.Empty;
         public DateTime? UpdatedAt { get; set; }

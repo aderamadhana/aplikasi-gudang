@@ -10,11 +10,11 @@ namespace gudang_net_baru.Models.Master.ReasonCode
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? IdReasonCode { get; set; } = default!;
         [AllowNull]
-        public string? Adjustment { get; set; }
+        public string? Kategori { get; set; }
         [AllowNull]
-        public string? Return { get; set; }
+        public string? ReasonCode { get; set; }
         [AllowNull]
-        public string? Transfer { get; set; }
+        public string? Deskripsi { get; set; }
         [AllowNull]
         public bool? Status { get; set; }
         [AllowNull]

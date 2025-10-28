@@ -8,11 +8,8 @@ namespace gudang_net_baru.Models.Master.UnitMeasure
     {
         public string? IdUnitMeasure { get; set; } = string.Empty;
         public string? UnitMeasureName { get; set; }
-        public int? Ea { get; set; }
-        public int? Box { get; set; }
-        public int? Carton { get; set; }
-        public int? Pallet { get; set; }
-        public int? Conversion { get; set; }
+        public string? Deskripsi { get; set; }
+        public string? Conversion { get; set; }
         public bool? Status { get; set; }
         public DateTime? CreatedAt { get; set; }
         public string? CreatedBy { get; set; }
