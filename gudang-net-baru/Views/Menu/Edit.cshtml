@@ -3,13 +3,14 @@
     var controller = ViewBag.ListController;
     var menu_parents = ViewBag.ListParent;
     var roles = ViewBag.ListRole;
+    ViewData["Title"] = "Edit Menu";
 }
 <div class="row">
     <div class="col-8">
         <div class="card">
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
-                    <h3>Tambah Menu</h3>
+                    <h3>Edit Menu</h3>
                     <div class="col mb-3">
                         <div class="form-group">
                             <label>Tipe Menu <span class="text-danger">*</span></label>
@@ -98,12 +99,14 @@
     </div>
 </div>
 <script>
-    
 
-    $(function () {
+
+     $(function () {
+        $(".hidden_items").hide(); // sembunyikan dulu
+
         function toggleHiddenItems() {
             if ($("#tipe_menu").val() === "label") {
-                $(".hidden_items").show();
+                $(".hidden_items").hide();
             } else {
                 $(".hidden_items").show();
             }
@@ -111,16 +114,12 @@
             console.log($("#tipe_menu").val());
         }
 
-        // Cek value awal saat halaman pertama kali dimuat
+        // cek value awal saat halaman pertama kali dimuat
         toggleHiddenItems();
 
-        $(".hidden_items").hide();
+        // ubah tampilan saat select berubah
         $("#tipe_menu").on("change", function () {
-            if ($(this).val() === "label") {
-                $(".hidden_items").hide();
-            } else {
-                $(".hidden_items").show();
-            }
+            toggleHiddenItems();
         });
     });
 

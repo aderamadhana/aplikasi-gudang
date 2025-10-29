@@ -1,0 +1,87 @@
+﻿.page-header {
+    background: linear-gradient(135deg, #4e73df, #1cc88a);
+    color: #fff;
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,.08);
+}
+
+.card-modern {
+    border: 0;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,.06);
+    overflow: hidden;
+}
+
+    .card-modern .card-header {
+        background: #ffffff;
+        border-bottom: 1px solid #eef0f4;
+        padding: .9rem 1.1rem;
+    }
+
+        .card-modern .card-header h5 {
+            margin: 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+            .card-modern .card-header h5 i {
+                opacity: .7;
+            }
+
+.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+.floating-add {
+    position: sticky;
+    top: .5rem; /* biar selalu terlihat di header table */
+}
+
+.table thead th {
+    background: #f3f5f9;
+    border-bottom: 2px solid #e7ebf3;
+}
+
+.table tbody tr:hover {
+    background: #fcfcfe;
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+
+.input-tight .form-control {
+    padding-top: .35rem;
+    padding-bottom: .35rem;
+}
+
+.summary-bar {
+    background: #fff;
+    border-radius: .75rem;
+    padding: .75rem 1rem;
+    border: 1px solid #eef0f4;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.summary-pill {
+    background: #eef7ff;
+    color: #1f6feb;
+    border-radius: 999px;
+    padding: .35rem .75rem;
+    font-weight: 600;
+}
+
+.form-actions {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}

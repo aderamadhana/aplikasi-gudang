@@ -199,12 +199,12 @@ namespace gudang_net_baru.Controllers
             var menu = await context.Menu.AsNoTracking()
                 .Where(m => m.IdMenu == id)
                 .Select(m => new { m.IdMenu, m.MenuIcon, m.RoleId, m.Urutan, m.MenuName, m.MenuType,
-                    ControllerName = (string?)m.ControllerName,
-                    ControllerFunction = (string?)m.ControllerFunction,
-                    ParentId = (string?)m.ParentId,
+                    ControllerName = m.ControllerName ?? "",
+                    ControllerFunction = m.ControllerFunction ?? "",
+                    ParentId = m.ParentId ?? "",
                 })
                 .FirstOrDefaultAsync();
-            return Json(menu);
+
             if (menu == null)
             {
                 return RedirectToAction("Index");
@@ -232,8 +232,6 @@ namespace gudang_net_baru.Controllers
                 })
                 .ToListAsync();
 
-            
-
             var menu_dto = new MenuDto()
             {
                 MenuType = menu?.MenuType,
@@ -251,7 +249,45 @@ namespace gudang_net_baru.Controllers
             ViewBag.ListController = list_controller;
             ViewBag.ListRole = list_role;
             ViewBag.ListParent = list_parent;
-            return View();
+            return View(menu_dto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(string id, MenuDto menuDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                return BadRequest(new { success = false, errors });
+            }
+
+            var menu = await context.Menu.FirstOrDefaultAsync(m => m.IdMenu == id);
+
+            if (menu == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+
+            menu.MenuName = menuDto.MenuName;
+            menu.MenuType = menuDto.MenuType;
+            menu.RoleId = menuDto.RoleId;
+            menu.Urutan = menuDto.Urutan;
+            menu.MenuIcon = menuDto.MenuIcon;
+            menu.ControllerName = menuDto.ControllerName;
+            menu.ControllerFunction = menuDto.ControllerFunction;
+            menu.ParentId = menuDto.ParentId;
+            menu.Status = true;
+            menu.CreatedAt = DateTime.Now;
+            menu.CreatedBy = HttpContext.Session.GetString("UserId");
+
+            context.SaveChanges();
+
+            return RedirectToAction("Index");
         }
     }
 }

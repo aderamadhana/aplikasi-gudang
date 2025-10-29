@@ -1,6 +1,7 @@
 ﻿@model UserDto
 @{
     var roles = ViewBag.Roles as List<RoleDto> ?? new List<RoleDto>();
+    ViewData["Title"] = "Edit User";
 }
 <div class="row">
     <div class="col-8">

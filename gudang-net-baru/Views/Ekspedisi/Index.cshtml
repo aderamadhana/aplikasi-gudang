@@ -1,19 +1,21 @@
 ﻿@{
+    ViewData["Title"] = "Ekpedisi";
 }
-<h3 class="mb-4 fw-bold"> Master Ekspedisi</h3>
+<!-- ====== Judul ====== -->
+<h3 class="mb-3 fw-bold"><i class="bi bi-truck"></i> Master Ekspedisi</h3>
 
-<div class="card">
+<div class="card card-modern">
     <div class="card-header p-3">
         <div class="container-fluid px-0">
             <div class="row g-2 align-items-center">
-                <!-- Filter -->
+                <!-- Filter (TETAP DI KIRI) -->
                 <div class="col-12 col-md-3">
                     <button class="btn btn-outline-dark w-50" data-bs-toggle="modal" data-bs-target="#filter-data">
                         <i class="bi bi-funnel"></i> Filter Data
                     </button>
                 </div>
 
-                <!-- Actions -->
+                <!-- Actions (TETAP DI KANAN & URUTAN SAMA) -->
                 <div class="col-12 col-md-9">
                     <div class="d-flex flex-wrap gap-2 justify-content-start justify-content-md-end">
                         <a class="btn btn-outline-success" asp-controller="Ekspedisi" asp-action="Create">
@@ -30,10 +32,11 @@
             </div>
         </div>
     </div>
+
     <div class="card-body">
         <!-- Table -->
         <div class="table-responsive">
-            <table class="table table-hover table-bordered table-striped align-middle" id="myTable">
+            <table class="table table-hover table-bordered table-striped align-middle" id="myTable" width="100%">
                 <thead class="table-primary text-center">
                     <tr>
                         <th style="width: 10%;">No</th>
