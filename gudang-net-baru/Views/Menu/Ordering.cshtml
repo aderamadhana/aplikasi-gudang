@@ -1,89 +1,199 @@
 ﻿@{
-    var menu = ViewBag.Menu;
+    // var menu = ViewBag.Menu;
+    var roles = ViewBag.Role;
     ViewData["Title"] = "Ordering Menu";
 }
-<h3 class="mb-4 fw-bold"> Ordering Menu</h3>
-<ul id="items-1" class="list-group sortable">
-    @foreach (var item in menu) {
-        <li class="list-group-item" data-id="@item.IdMenu">
-            <span class="drag-handle">⋮⋮</span> @item.MenuName
-            <ul class="list-group sortable ms-4">
-                @if (item.Children != null)
-                {
-                    @foreach (var item_child in item.Children)
-                    {
-                        <li class="list-group-item" data-id="@item_child.IdMenu">
-                        <span class="drag-handle">⋮⋮</span> @item_child.MenuName
-                    </li>
-                    }
-                }
-            </ul>
-        </li>
-    }
-</ul>
+<div class="row">
+    <div class="col-12">
+        <div class="card card-modern">
+            <div class="card-body">
+                <h3 class="mb-4 fw-bold"> Ordering Menu</h3>
+                <div class="col-4 mb-3">
+                    <label>Pilih Role<span class="text-danger">*</span></label>
+                    <select class="form-control select2" style="width: 100%" id="selectRole">
+                        <option value="">Pilih</option>
+                        @foreach (var items in roles)
+                        {
+                            <option value="@items.Id">@items.Name</option>
+                        }
+                    </select>
+                </div>
+                <div id="menuOrderingWrap" class="d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Ordering Menu</h6>
+                        <button id="btnSimpanOrder" class="btn btn-primary btn-sm" disabled>Simpan Urutan</button>
+                    </div>
+                    <div id="menuTree"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Html.AntiForgeryToken()
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script>
-    // init all ULs that should be droppable
-    function initNestedSortables(root = document) {
-      root.querySelectorAll('ul.sortable').forEach(ul => {
-        if (ul._sortable) return; // prevent double init
-        ul._sortable = new Sortable(ul, {
-          group: { name: 'menus', pull: true, put: true },
-          animation: 150,
-          handle: '.drag-handle',                // drag only by handle
-          draggable: '> li.list-group-item',     // only direct LI children
-          ghostClass: 'sortable-ghost',
-          chosenClass: 'sortable-chosen',
-          fallbackOnBody: true,
-          swapThreshold: 0.65,
-
-          // when item is dropped (moved or re-ordered)
-          onEnd(evt) {
-            applyOrdering(evt.to); // compute new order under the new parent
-            // you can also send a single move:
-            const movedId = evt.item.dataset.id;
-            const newParentId = parentIdOfList(evt.to);
-            const newIndex = evt.newIndex;
-            console.log('moved', { movedId, newParentId, newIndex });
-          }
+    function collectTree($ul, parentId = null) {
+      const items = [];
+      $ul.children('li').each(function (index) {
+        const $li = $(this);
+        const id = $li.data('id');
+        const $childUl = $li.children('ul.sortable').first();
+        items.push({
+          id: id,
+          parentId: parentId,
+          order: index,
+          children: $childUl.length ? collectTree($childUl, id) : []
         });
       });
+      return items;
     }
 
-    // Helper: get parent id for a child UL
-    function parentIdOfList(ul) {
-      const parentLi = ul.closest('li.list-group-item'); // direct or nested
-      return parentLi ? parentLi.dataset.id : null;       // null = root
+    // optional: flatten jika backend mau 1 dimensi
+    function flatten(items, acc = []) {
+      items.forEach(n => {
+        acc.push({ id: n.id, parentId: n.parentId, order: n.order });
+        if (n.children?.length) flatten(n.children, acc);
+      });
+      return acc;
     }
 
-    // Recompute sibling order for the list just changed
-    function applyOrdering(ul) {
-      const parentId = parentIdOfList(ul);
-      const order = Array.from(ul.children)
-        .filter(el => el.matches('li.list-group-item'))
-        .map((li, i) => ({ id: li.dataset.id, parentId, sort: i }));
-      console.log('order under parent', parentId, order);
-      // TODO: send `order` to server to update ParentId/SortOrder
-    }
+    const $role = $('#selectRole');
+    const $wrap = $('#menuOrderingWrap');
+    const $tree = $('#menuTree');
+    const $btnSave = $('#btnSimpanOrder');
+    let currentRoleId = null;
+    let sortables = [];
+    
+    $role.on('change', function () {
+        const val = $(this).val();
+        currentRoleId = val || null;
 
-    // (Optional) serialize whole tree
-    function serializeList(ul) {
-      return Array.from(ul.children)
-        .filter(li => li.matches('li.list-group-item'))
-        .map(li => {
-          const child = li.querySelector(':scope > ul.sortable');
-          return { id: li.dataset.id, children: child ? serializeList(child) : [] };
+        // reset UI
+        $tree.empty();
+        $btnSave.prop('disabled', true);
+        $wrap.toggleClass('d-none', !currentRoleId);
+
+        if (!currentRoleId) return;
+
+        // load partial
+        $.get('/Menu/GetMenuByRole', { roleId: currentRoleId })
+            .done(function (data) {
+
+                // --- helper: kalau masih flat, ubah ke tree
+                function buildTree(items) {
+                    const map = new Map();
+                    items.forEach(x => map.set(x.idMenu, { ...x, children: [] }));
+
+                    const roots = [];
+                    items.forEach(x => {
+                        const node = map.get(x.idMenu);
+                        const p = x.parentId || null; // sesuaikan kalau field berbeda
+                        if (p && map.has(p)) {
+                            map.get(p).children.push(node);
+                        } else {
+                            roots.push(node);
+                        }
+                    });
+                    return roots;
+                }
+
+                // --- helper: render rekursif (child ikut terpasang)
+                function renderTree(nodes) {
+                    const hasChildren = n => Array.isArray(n.children) && n.children.length > 0;
+
+                    const renderLi = n => `
+                        <li class="list-group-item" data-id="${n.idMenu}">
+                            <span class="drag-handle">⋮⋮</span> ${escapeHtml(n.menuName)}
+                            ${hasChildren(n) ? `<ul class="list-group sortable ms-4">
+                                ${n.children.map(renderLi).join('')}
+                            </ul>` : ''}
+                        </li>`;
+
+                    return `<ul class="list-group sortable">
+                        ${nodes.map(renderLi).join('')}
+                    </ul>`;
+                }
+
+                function escapeHtml(s) {
+                    return String(s).replace(/[&<>"']/g, m =>
+                        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+                }
+
+                // --- jika API sudah tree (punya children array), pakai langsung
+                const isAlreadyTree = Array.isArray(data) && data.every(x => 'children' in x);
+                const tree = isAlreadyTree ? data : buildTree(data);
+
+                // render
+                $("#menuTree").html(renderTree(tree));
+
+                // --- aktifkan drag & drop di semua level
+                if (window.sortables) window.sortables.forEach(s => s.destroy());
+                window.sortables = [];
+                $("#menuTree .sortable").each(function () {
+                    const s = new Sortable(this, {
+                        group: 'nested',
+                        handle: '.drag-handle',
+                        animation: 150,
+                        fallbackOnBody: true,
+                        swapThreshold: 0.65
+                    });
+                    window.sortables.push(s);
+                });
+
+                $btnSave.prop('disabled', false);
+            })
+            .fail(() => {
+                // $wrap.addClass('d-none');
+                alert('Gagal memuat menu.');
+            });
+    });
+
+    $('#btnSimpanOrder').on('click', async function () {
+      if (!currentRoleId) return;
+
+      const $root = $('#menuTree').find('ul.sortable').first();
+
+      // ✅ Kumpulkan urutan menu dari DOM
+      const items = [];
+      $root.find('li.list-group-item').each(function () {
+        const $li = $(this);
+        const id = $li.data('id');                           // string id menu
+        const parentLi = $li.parents('li.list-group-item').first();
+        const parentId = parentLi.length ? parentLi.data('id') : null; // parent id
+        const order = $li.index();                           // posisi/urutannya
+
+        items.push({ id, parentId, order });
+      });
+
+      const token = $('input[name="__RequestVerificationToken"]').val();
+
+      try {
+        const res = await fetch('/Menu/SaveMenuOrder', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': token
+          },
+          body: JSON.stringify({
+              roleId: currentRoleId,
+              items: items
+          })
         });
-    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      initNestedSortables();
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const json = await res.json();
+        showAlert(json?.message || "Urutan menu tersimpan", "success");
 
-      // Example: get full tree
-      // const tree = serializeList(document.getElementById('items-1'));
-      // console.log(JSON.stringify(tree, null, 2));
+        // redirect setelah sedikit delay biar alert xsempat tampil
+        setTimeout(() => {
+            window.location.href = '/Menu/Index';
+        }, 1200);
+
+      } catch (e) {
+        console.error(e);
+        showAlert("Gagal menyimpan urutan", "danger");
+      }
     });
 </script>

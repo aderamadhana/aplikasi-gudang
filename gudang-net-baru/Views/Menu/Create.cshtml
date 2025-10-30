@@ -79,7 +79,7 @@
                             <option value="">Pilih</option>
                             @foreach (var items in menu_parents)
                             {
-                                <option value="@items.IdMenu">@items.MenuName</option>
+                                <option value="@items.IdMenu">@items.MenuName - @items.RoleName</option>
                             }
                         </select>
                         <span asp-validation-for="ParentId" class="text-danger"></span>

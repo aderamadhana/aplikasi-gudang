@@ -174,9 +174,9 @@
         $.post('/Login/SetRoleSession', { role: selectedRole }, function () {
             showAlert("Role berhasil diganti!","success");
            
-            setTimeout(function () {
-                location.reload();
-            }, 1000); // reload setelah 1 detik
+            setTimeout(() => {
+                window.location.href = '/Home/Index';
+            }, 1200);
         });
     });
     
@@ -186,9 +186,9 @@
         $.post('/Login/SetRoleSession', { role: selectedRole }, function () {
             showAlert("Role berhasil diganti!","success");
 
-            setTimeout(function () {
-                location.reload();
-            }, 1000); // reload setelah 1 detik
+            setTimeout(() => {
+                window.location.href = '/Home/Index';
+            }, 1200);
         });
     });
 </script>

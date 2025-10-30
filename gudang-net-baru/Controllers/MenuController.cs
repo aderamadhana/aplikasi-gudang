@@ -1,4 +1,5 @@
-﻿using gudang_net_baru.Models;
+﻿using gudang_net_baru.Migrations;
+using gudang_net_baru.Models;
 using gudang_net_baru.Models.Konfigurasi.Menu;
 using gudang_net_baru.Models.Master.Lokasi;
 using gudang_net_baru.Services;
@@ -89,16 +90,24 @@ namespace gudang_net_baru.Controllers
                 .OrderBy(r => r.Name)
                 .ToListAsync();
 
-            var list_parent = await context.Menu
-                .Where(m => m.MenuType == "menu" && m.ParentId == null && m.Status == true)
-                .Select(m => new {
-                    m.IdMenu,
-                    m.MenuName,
-                    m.MenuType,
-                    m.ParentId,
-                    m.Status
-                })
-                .ToListAsync();
+            var list_parent = await
+               (
+                   from m in context.Menu
+                   join r in context.Roles on m.RoleId equals r.Id
+                   where m.MenuType == "menu"
+                       && m.ParentId == null
+                       && m.Status == true
+                   select new
+                   {
+                       m.IdMenu,
+                       m.MenuName,
+                       m.MenuType,
+                       m.ParentId,
+                       RoleId = r.Id,
+                       RoleName = r.Name,
+                       Status = m.Status ?? false
+                   }
+               ).ToListAsync();
 
             ViewBag.ListController = list_controller;
             ViewBag.ListRole = list_role;
@@ -123,16 +132,24 @@ namespace gudang_net_baru.Controllers
                     .OrderBy(r => r.Name)
                     .ToListAsync();
 
-                var list_parent = await context.Menu
-                    .Where(m => m.MenuType == "menu" && m.ParentId == null && m.Status == true)
-                    .Select(m => new {
+                var list_parent = await
+                (
+                    from m in context.Menu
+                    join r in context.Roles on m.RoleId equals r.Id
+                    where m.MenuType == "menu"
+                        && m.ParentId == null
+                        && m.Status == true
+                    select new
+                    {
                         m.IdMenu,
                         m.MenuName,
                         m.MenuType,
                         m.ParentId,
+                        RoleId = r.Id,
+                        RoleName = r.Name,
                         Status = m.Status ?? false
-                    })
-                    .ToListAsync();
+                    }
+                ).ToListAsync();
 
                 ViewBag.ListController = list_controller;
                 ViewBag.ListRole = list_role;
@@ -164,8 +181,49 @@ namespace gudang_net_baru.Controllers
 
         public async Task<IActionResult> Ordering()
         {
+            var list_role = await roleManager.Roles
+                .Select(r => new RoleDto { Id = r.Id, Name = r.Name })
+                .OrderBy(r => r.Name)
+                .ToListAsync();
+
+            ViewBag.Role = list_role;
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveMenuOrder([FromBody] SaveMenuOrderRequest req)
+        {
+            if (req == null || string.IsNullOrEmpty(req.RoleId) || req.Items == null || req.Items.Count == 0)
+                return BadRequest("Data tidak valid");
+
+            var roleId = req.RoleId;
+            var items = req.Items;
+
+            // ambil menu berdasarkan Id (string based)
+            var ids = items.Select(x => x.Id).ToList();
+
+            foreach (var dto in items)
+            {
+                var stub = new MenuEntity { IdMenu = dto.Id };   // hanya set PK
+                context.Attach(stub);                      // attach tanpa SELECT
+
+                // Set nilai yang mau diupdate
+                stub.ParentId = string.IsNullOrWhiteSpace(dto.ParentId) ? null : dto.ParentId;
+                stub.Urutan = dto.Order;
+
+                // Tandai hanya kolom tersebut yang berubah
+                context.Entry(stub).Property(x => x.ParentId).IsModified = true;
+                context.Entry(stub).Property(x => x.Urutan).IsModified = true;
+            }
+
+            var affected = context.SaveChanges();
+            return Json(new { success = affected > 0, affected });
+        }
+
+        public async Task<IActionResult> GetMenuByRole(string roleId)
+        {
             var parentsWithChildren = await context.Menu
-                .Where(m => m.MenuType == "menu" && m.ParentId == null && m.Status == true)
+                .Where(m => m.ParentId == null && m.Status == true && m.RoleId == roleId)
                 .Select(m => new {
                     m.IdMenu,
                     m.MenuName,
@@ -174,7 +232,7 @@ namespace gudang_net_baru.Controllers
                     m.Urutan,
                     Status = m.Status ?? false,
                     Children = context.Menu
-                        .Where(c => c.ParentId == m.IdMenu && c.Status == true && c.MenuType == "menu")
+                        .Where(c => c.ParentId == m.IdMenu && c.Status == true && c.RoleId == roleId)
                         .Select(c => new {
                             c.IdMenu,
                             c.MenuName,
@@ -189,9 +247,7 @@ namespace gudang_net_baru.Controllers
                 .OrderBy(m => m.Urutan)
                 .ToListAsync();
 
-            ViewBag.Menu = parentsWithChildren;
-            
-            return View();
+            return Json(parentsWithChildren);
         }
 
         public async Task<IActionResult> EditAsync(string id)
@@ -221,16 +277,24 @@ namespace gudang_net_baru.Controllers
                 .OrderBy(r => r.Name)
                 .ToListAsync();
 
-            var list_parent = await context.Menu
-                .Where(m => m.MenuType == "menu" && m.ParentId == null && m.Status == true)
-                .Select(m => new {
-                    m.IdMenu,
-                    m.MenuName,
-                    m.MenuType,
-                    m.ParentId,
-                    m.Status
-                })
-                .ToListAsync();
+            var list_parent = await
+               (
+                   from m in context.Menu
+                   join r in context.Roles on m.RoleId equals r.Id
+                   where m.MenuType == "menu"
+                       && m.ParentId == null
+                       && m.Status == true
+                   select new
+                   {
+                       m.IdMenu,
+                       m.MenuName,
+                       m.MenuType,
+                       m.ParentId,
+                       RoleId = r.Id,
+                       RoleName = r.Name,
+                       Status = m.Status ?? false
+                   }
+               ).ToListAsync();
 
             var menu_dto = new MenuDto()
             {
@@ -289,5 +353,7 @@ namespace gudang_net_baru.Controllers
 
             return RedirectToAction("Index");
         }
+
+
     }
 }

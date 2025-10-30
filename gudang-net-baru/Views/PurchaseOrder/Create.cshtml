@@ -1,5 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Tambah Purchase Order";
+    var supplier = ViewBag.ListSupplier;
+    var sku = ViewBag.ListSku;
 }
 
 <!-- Header -->
@@ -21,11 +23,12 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label required">Supplier</label>
-                    <select class="form-select" name="supplier" required>
+                    <select class="form-select select2" name="supplier" required>
                         <option value="" selected disabled>Pilih Supplier</option>
-                        <option value="SUP-001">SUP-001 • PT Sejahtera</option>
-                        <option value="SUP-002">SUP-002 • CV Maju Jaya</option>
-                        <option value="SUP-003">SUP-003 • UD Sentosa</option>
+                        @foreach(var supp in supplier)
+                        {
+                            <option value="@supp.IdSupplier">@supp.NamaSupplier</option>
+                        }
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -73,17 +76,21 @@
                     </thead>
                     <tbody class="input-tight">
                         <tr>
-                            <td><input type="text" class="form-control" name="sku[]" placeholder="SKU"></td>
-                            <td><input type="text" class="form-control" name="nama_item[]" placeholder="Nama item"></td>
+                            <td>
+                                <select class="form-select select2" name="sku[]" required onchange="pilihSku(this)">
+                                    <option value="" selected disabled>Pilih SKU</option>
+                                    @foreach (var item in sku)
+                                    {
+                                        <option value="@item.IdSku">@item.KodeSku</option>
+                                    }
+                                </select>
+                            </td>
+                            <td><input readonly type="text" class="form-control" name="nama_item[]" placeholder="Nama item"></td>
                             <td>
                                 <input type="number" class="form-control qty-input" name="qty_order[]" min="0" step="1" placeholder="0">
                             </td>
                             <td>
-                                <select class="form-select" name="unit[]">
-                                    <option value="pcs">pcs</option>
-                                    <option value="box">box</option>
-                                    <option value="kg">kg</option>
-                                </select>
+                                <input readonly type="text" class="form-control" name="unit[]" placeholder="Unit">
                             </td>
                             <td><input type="text" class="form-control" name="keterangan[]" placeholder="Catatan (opsional)"></td>
                             <td class="text-center">
@@ -124,15 +131,19 @@
     function newRowTemplate() {
       return `
         <tr>
-          <td><input type="text" class="form-control" name="sku[]" placeholder="SKU"></td>
-          <td><input type="text" class="form-control" name="nama_item[]" placeholder="Nama item"></td>
+          <td>
+            <select class="form-select select2" name="sku[]" required onchange="pilihSku(this)">
+                <option value="" selected disabled>Pilih SKU</option>
+                @foreach (var item in sku)
+                {
+                        <option value="@item.IdSku">@item.KodeSku</option>
+                }
+            </select>
+          </td>
+          <td><input readonly type="text" class="form-control" name="nama_item[]" placeholder="Nama item"></td>
           <td><input type="number" class="form-control qty-input" name="qty_order[]" min="0" step="1" placeholder="0"></td>
           <td>
-            <select class="form-select" name="unit[]">
-              <option value="pcs">pcs</option>
-              <option value="box">box</option>
-              <option value="kg">kg</option>
-            </select>
+            <input readonly type="text" class="form-control" name="unit[]" placeholder="Unit">
           </td>
           <td><input type="text" class="form-control" name="keterangan[]" placeholder="Catatan (opsional)"></td>
           <td class="text-center">
@@ -145,22 +156,30 @@
     }
 
     function recalcTotals() {
-      let totalQty = 0;
-      $('.qty-input').each(function() {
+        let totalQty = 0;
+
+        // jumlahkan qty
+        $('.qty-input').each(function() {
         const val = parseFloat($(this).val());
         if (!isNaN(val)) totalQty += val;
-      });
-      $('#totalQty').val(totalQty);
-      $('#totalQtyBadge').text(totalQty);
+        });
 
-      const itemCount = $('#orderTable tbody tr').length;
-      $('#totalItem').text(itemCount);
+        $('#totalQty').val(totalQty || 0);
+        $('#totalQtyBadge').text(totalQty || 0);
+
+        // ✅ hitung hanya baris yang benar2 item (punya .qty-input & visible)
+        const itemCount = $('#orderTable tbody tr').filter(function () {
+        return $(this).is(':visible') && $(this).find('.qty-input').length > 0;
+        }).length;
+
+        $('#totalItem').text(itemCount);
     }
 
     $(document).ready(function () {
       // Tambah baris
       $('#addRowBtn').on('click', function () {
         $('#orderTable tbody').append(newRowTemplate());
+        $('.select2').select2();
         recalcTotals();
       });
 
@@ -174,17 +193,27 @@
       $('#orderTable').on('input', '.qty-input', recalcTotals);
 
       // Reset form
-      $('#poForm').on('reset', function () {
-        // beri jeda agar input ter-reset dulu
-        setTimeout(function () {
-          // sisakan 1 baris
-          const $tbody = $('#orderTable tbody');
-          $tbody.find('tr:gt(0)').remove();
-          $tbody.find('input').val('');
-          $tbody.find('select').each(function(){ this.selectedIndex = 0; });
-          recalcTotals();
-        }, 0);
-      });
+        $('#poForm').on('reset', function () {
+            setTimeout(function () {
+            const $tbody = $('#orderTable tbody');
+
+            // hapus semua baris item kecuali yang pertama yang memang baris input
+            $tbody.find('tr').filter(function(){
+                return $(this).find('.qty-input').length > 0;
+            }).slice(1).remove();
+
+            // kosongkan field di baris yang tersisa
+            $tbody.find('input[type="text"], input[type="number"]').val('');
+            $tbody.find('select').each(function(){ this.selectedIndex = 0; });
+            $tbody.find('select.select2').val(null).trigger('change');
+
+            // set ke 0 lalu hitung ulang
+            $('#totalQty').val(0);
+            $('#totalQtyBadge').text(0);
+            $('#totalItem').text(1);
+
+            }, 0);
+        });
 
       // Validasi ringan saat submit
       $('#poForm').on('submit', function (e) {
@@ -208,4 +237,15 @@
       // Hitung awal
       recalcTotals();
     });
+
+    var skuData = @Html.Raw(Json.Serialize(sku));
+    function pilihSku(el) {
+        const selectedSku = $(el).val();
+        const row = $(el).closest('tr');
+
+        const data = skuData.find(x => x.idSku == selectedSku);
+        console.log(data);
+        row.find('input[name="nama_item[]"]').val(data.namaBarang);
+        row.find('input[name="unit[]"]').val(data.unitMeasureName);
+    }
 </script>

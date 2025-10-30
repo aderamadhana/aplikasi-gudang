@@ -204,12 +204,12 @@
                     loadtable();
                 }else{
 
-                    showAlert(data.message, "error");
+                    showAlert(data.message, "danger");
                     loadtable();
                 }
             })
             .catch(err => {
-                showAlert(err, "error");
+                showAlert(err, "danger");
             });
             }
         });
@@ -238,12 +238,12 @@
                     $('#import-data').modal('hide');
                     loadtable();
                 }else{
-                    showAlert(data.message, "error");
+                    showAlert(data.message, "danger");
                     loadtable();
                 }
             },
             error: function (xhr) {
-                showAlert(xhr, "error");
+                showAlert(xhr, "danger");
             }
         });
     }
@@ -272,12 +272,12 @@
                     showAlert(data.message, "success");
                     loadtable();
                 }else{
-                    showAlert(data.message, "error");
+                    showAlert(data.message, "danger");
                     loadtable();
                 }
             })
             .catch(err => {
-                showAlert(err, "error");
+                showAlert(err, "danger");
                 console.error(err);
             });
             }
@@ -312,7 +312,7 @@
             URL.revokeObjectURL(url);
           },
           error: function (xhr) {
-              showAlert('Gagal export: ' + xhr.status + ' ' + xhr.statusText, "error");
+              showAlert('Gagal export: ' + xhr.status + ' ' + xhr.statusText, "danger");
           }
         });
     }
