@@ -85,3 +85,21 @@
     flex-wrap: wrap;
     justify-content: flex-end;
 }
+
+
+.select2-container {
+    width: 100% !important;
+}
+
+.select2-selection {
+    height: 38px !important;
+    padding: 5px 10px;
+}
+
+.select2-selection__rendered {
+    line-height: 28px !important;
+}
+
+.select2-selection__arrow {
+    height: 36px !important;
+}

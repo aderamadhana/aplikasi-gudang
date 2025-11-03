@@ -7,6 +7,7 @@ using gudang_net_baru.Models.Master.ReasonCode;
 using gudang_net_baru.Models.Master.Sku;
 using gudang_net_baru.Models.Master.Supplier;
 using gudang_net_baru.Models.Master.UnitMeasure;
+using gudang_net_baru.Models.Transaction.PurchaseOrder;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,5 +28,7 @@ namespace gudang_net_baru.Services
         public DbSet<SkuEntity> MasterSku { get; set; }
         public DbSet<SupplierEntity> MasterSupplier { get; set; }
         public DbSet<UnitMeasureEntity> MasterUnitMeasure { get; set; }
+        public DbSet<PurchaseOrderEntity> PurchaseOrder { get; set; }        
+        public DbSet<PurchaseOrderDetailEntity> PurchaseOrderDetail { get; set; }
     }
 }

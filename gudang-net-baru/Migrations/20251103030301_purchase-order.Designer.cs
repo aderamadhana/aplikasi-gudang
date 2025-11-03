@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using gudang_net_baru.Services;
 
@@ -11,9 +12,11 @@ using gudang_net_baru.Services;
 namespace gudang_net_baru.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251103030301_purchase-order")]
+    partial class purchaseorder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -630,11 +633,17 @@ namespace gudang_net_baru.Migrations
                     b.Property<string>("PurchaseOrderEntityPurchaseOrderId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("PurchaseOrderId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("QtyOrder")
                         .HasColumnType("int");
 
                     b.Property<int?>("QtyReceived")
                         .HasColumnType("int");
+
+                    b.Property<string>("UnitMeasureId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UnitMeasureName")
                         .HasColumnType("nvarchar(max)");
@@ -665,9 +674,6 @@ namespace gudang_net_baru.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Keterangan")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PoNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("Status")

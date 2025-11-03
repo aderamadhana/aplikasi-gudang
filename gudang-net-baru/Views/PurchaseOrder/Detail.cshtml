@@ -1,6 +1,6 @@
 ﻿@model gudang_net_baru.Models.Transaction.PurchaseOrder.PurchaseOrderDto;
 @{
-    ViewData["Title"] = "Tambah Purchase Order";
+    ViewData["Title"] = "Detail Purchase Order";
     var supplier = ViewBag.ListSupplier;
     var sku = ViewBag.ListSku;
 }
@@ -26,7 +26,7 @@
                     <label class="form-label required">Supplier</label>
                     <select class="form-select select2" required id="supplier">
                         <option value="" selected disabled>Pilih Supplier</option>
-                        @foreach(var supp in supplier)
+                        @foreach (var supp in supplier)
                         {
                             <option value="@supp.IdSupplier">@supp.NamaSupplier</option>
                         }
@@ -137,7 +137,7 @@
                 <option value="" selected disabled>Pilih SKU</option>
                 @foreach (var item in sku)
                 {
-                        <option value="@item.IdSku">@item.KodeSku</option>
+                            <option value="@item.IdSku">@item.KodeSku</option>
                 }
             </select>
           </td>
@@ -269,7 +269,7 @@
     function calcTotalQty(items){
         return items.reduce((a,b)=> a + (parseInt(b.qtyOrder||0,10)), 0);
     }
-    
+
     function getCsrf() {
         return document.querySelector('input[name="__RequestVerificationToken"]').value;
     }
