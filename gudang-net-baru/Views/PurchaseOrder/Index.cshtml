@@ -147,7 +147,17 @@
                   render: (data, type, row, meta) => meta.row + 1, // kasih nomor urut
                   defaultContent: ''
                 },
-                { data: 'poNumber', defaultContent: '' },
+                { 
+                    data: 'poNumber', 
+                    defaultContent: '',
+                    render: (d, type, row) => {
+                        if(row.poNumber != null && row.poNumber != ""){
+                            return row.poNumber;
+                        }else{
+                            return "Data belum tersedia";
+                        }
+                    },
+                },
                 { data: 'supplierName', defaultContent: '' },
                 {
                     data: 'tanggalPo',

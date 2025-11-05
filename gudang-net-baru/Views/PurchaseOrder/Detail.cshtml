@@ -1,8 +1,9 @@
 ﻿@model gudang_net_baru.Models.Transaction.PurchaseOrder.PurchaseOrderDto;
 @{
-    ViewData["Title"] = "Detail Purchase Order";
+    ViewData["Title"] = "Edit Purchase Order";
     var supplier = ViewBag.ListSupplier;
     var sku = ViewBag.ListSku;
+    var id = ViewBag.Id;
 }
 
 <!-- Header -->
@@ -12,7 +13,6 @@
         <small class="opacity-75">Buat PO baru untuk pembelian barang</small>
     </div>
 </div>
-
 <form method="post" enctype="multipart/form-data" id="poForm">
 
     <!-- DETAIL -->
@@ -21,33 +21,51 @@
             <h5><i class="bi bi-receipt"></i> Data Supplier</h5>
         </div>
         <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label required">Supplier</label>
-                    <select class="form-select select2" required id="supplier">
-                        <option value="" selected disabled>Pilih Supplier</option>
-                        @foreach (var supp in supplier)
-                        {
-                            <option value="@supp.IdSupplier">@supp.NamaSupplier</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label required">Tanggal PO</label>
-                    <input type="date" id="tanggalPo" class="form-control" required>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label required">Total Qty</label>
-                    <div class="input-group">
-                        <input type="number" class="form-control" id="totalQty" readonly placeholder="0">
-                        <span class="input-group-text">pcs</span>
-                    </div>
-                    <div class="form-text">Otomatis dihitung dari Items.</div>
-                </div>
-                <div class="col-12">
-                    <label class="form-label">Keterangan</label>
-                    <textarea class="form-control" id="keterangan" rows="2" placeholder="Catatan tambahan (opsional)"></textarea>
-                </div>
+            <div class="row g-3 p-3">
+                <table class="table table-sm table-striped mb-0">
+                    <tbody>
+                        <tr>
+                            <th style="width: 20%;">Supplier</th>
+                            <td>
+                                : <span id="supplierText">@Model?.SupplierName</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th style="width:160px">Tanggal PO</th>
+                            <td style="width:240px">
+                                : <span id="tanggalPoText">@Model?.TanggalPo.ToString("dd MMM yyyy")</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Total Qty</th>
+                            <td>
+                                : <span id="totalQtyText">@Model?.TotalQty pcs</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Keterangan</th>
+                            <td>
+                                : <span class="mb-0" id="keteranganText">@Model?.Keterangan</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Status Purchase Order (PO)</th>
+                            <td>
+                                :
+                                @if(Model.StatusPo == "Draft")
+                                {
+                                    <span class="badge bg-warning" id="statusPo">@Model?.StatusPo</span>
+                                }else if(Model.StatusPo == "Posted")
+                                {
+                                    <span class="badge bg-info" id="statusPo">@Model?.StatusPo</span>
+                                }else if(Model.StatusPo == "Closed")
+                                {
+                                    <span class="badge bg-success" id="statusPo">@Model?.StatusPo</span>
+                                }
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -56,270 +74,40 @@
     <div class="card card-modern mb-3">
         <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="mb-0"><i class="bi bi-bag-check"></i> Items Order</h5>
-            <div class="floating-add">
-                <button type="button" class="btn btn-success btn-sm" id="addRowBtn">
-                    <i class="bi bi-plus-lg me-1"></i> Tambah Item
-                </button>
-            </div>
         </div>
         <div class="card-body">
-            <div class="table-responsive">
-                <table id="orderTable" class="table table-bordered align-middle">
-                    <thead>
+            <div class="table-responsive p-3" style="max-height:52vh;overflow:auto;">
+                <table class="table table-sm table-bordered align-middle mb-0">
+                    <thead class="table-light sticky-top">
                         <tr>
-                            <th style="width:12%">SKU</th>
                             <th>Nama Item</th>
-                            <th style="width:14%">Qty Order</th>
+                            <th style="width:12%">Qty Order</th>
                             <th style="width:12%">Unit</th>
                             <th>Keterangan</th>
-                            <th style="width:48px"></th>
                         </tr>
                     </thead>
-                    <tbody class="input-tight">
-                        <tr>
-                            <td>
-                                <select class="form-select select2 sku" name="sku[]" required onchange="pilihSku(this)">
-                                    <option value="" selected disabled>Pilih SKU</option>
-                                    @foreach (var item in sku)
-                                    {
-                                        <option value="@item.IdSku">@item.KodeSku</option>
-                                    }
-                                </select>
-                            </td>
-                            <td><input readonly type="text" class="form-control item-name" name="nama_item[]" placeholder="Nama item"></td>
-                            <td>
-                                <input type="number" class="form-control qty-order" name="qty_order[]" min="0" step="1" placeholder="0">
-                            </td>
-                            <td>
-                                <input readonly type="text" class="form-control unit-name" name="unit[]" placeholder="Unit">
-                            </td>
-                            <td><input type="text" class="form-control keterangan-item" name="keterangan[]" placeholder="Catatan (opsional)"></td>
-                            <td class="text-center">
-                                <button type="button" class="btn btn-outline-danger btn-sm removeRowBtn" title="Hapus baris">
-                                    <i class="bi bi-trash3"></i>
-                                </button>
-                            </td>
-                        </tr>
+
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <span>@item.ItemName</span>
+                                </td>
+                                <td>
+                                    <span>@item.QtyOrder</span>
+                                </td>
+                                <td>
+                                    <span>@item.UnitMeasureName</span>
+                                </td>
+                                <td>
+                                    <span>@item.KeteranganNotes</span>
+                                </td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
-            </div>
-
-            <!-- Summary di bawah table -->
-            <div class="mt-3 summary-bar">
-                <div>
-                    <span class="me-2 text-muted">Ringkasan:</span>
-                    <span class="summary-pill">Total Item: <span id="totalItem">1</span></span>
-                    <span class="summary-pill">Total Qty: <span id="totalQtyBadge">0</span></span>
-                </div>
-                <div class="form-actions">
-                    <button type="reset" class="btn btn-light border">
-                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
-                    </button>
-                    <button id="btnSimpanDraft" type="button" class="btn btn-warning">
-                        <i class="bi bi-save2 me-1"></i> Simpan Draft
-                    </button>
-                    <button id="btnSimpanPo" type="button" class="btn btn-primary">
-                        <i class="bi bi-save2 me-1"></i> Simpan PO
-                    </button>
-                </div>
             </div>
         </div>
     </div>
 </form>
-
-<script>
-    // Tambah baris item
-    function newRowTemplate() {
-      return `
-        <tr>
-          <td>
-            <select class="form-select select2 sku" name="sku[]" required onchange="pilihSku(this)">
-                <option value="" selected disabled>Pilih SKU</option>
-                @foreach (var item in sku)
-                {
-                            <option value="@item.IdSku">@item.KodeSku</option>
-                }
-            </select>
-          </td>
-          <td><input readonly type="text" class="form-control item-name" name="nama_item[]" placeholder="Nama item"></td>
-          <td><input type="number" class="form-control qty-order" name="qty_order[]" min="0" step="1" placeholder="0"></td>
-          <td>
-            <input readonly type="text" class="form-control unit-name" name="unit[]" placeholder="Unit">
-          </td>
-          <td><input type="text" class="form-control keterangan-item" name="keterangan[]" placeholder="Catatan (opsional)"></td>
-          <td class="text-center">
-            <button type="button" class="btn btn-outline-danger btn-sm removeRowBtn" title="Hapus baris">
-              <i class="bi bi-trash3"></i>
-            </button>
-          </td>
-        </tr>
-      `;
-    }
-
-    function recalcTotals() {
-        let totalQty = 0;
-
-        // jumlahkan qty
-        $('.qty-order').each(function() {
-        const val = parseFloat($(this).val());
-        if (!isNaN(val)) totalQty += val;
-        });
-
-        $('#totalQty').val(totalQty || 0);
-        $('#totalQtyBadge').text(totalQty || 0);
-
-        // ✅ hitung hanya baris yang benar2 item (punya .qty-order & visible)
-        const itemCount = $('#orderTable tbody tr').filter(function () {
-        return $(this).is(':visible') && $(this).find('.qty-order').length > 0;
-        }).length;
-
-        $('#totalItem').text(itemCount);
-    }
-
-    $(document).ready(function () {
-      // Tambah baris
-      $('#addRowBtn').on('click', function () {
-        $('#orderTable tbody').append(newRowTemplate());
-        $('.select2').select2();
-        recalcTotals();
-      });
-
-      // Hapus baris (event delegation)
-      $('#orderTable').on('click', '.removeRowBtn', function () {
-        $(this).closest('tr').remove();
-        recalcTotals();
-      });
-
-      // Recalc saat qty berubah
-      $('#orderTable').on('input', '.qty-order', recalcTotals);
-
-      // Reset form
-        $('#poForm').on('reset', function () {
-            setTimeout(function () {
-            const $tbody = $('#orderTable tbody');
-
-            // hapus semua baris item kecuali yang pertama yang memang baris input
-            $tbody.find('tr').filter(function(){
-                return $(this).find('.qty-order').length > 0;
-            }).slice(1).remove();
-
-            // kosongkan field di baris yang tersisa
-            $tbody.find('input[type="text"], input[type="number"]').val('');
-            $tbody.find('select').each(function(){ this.selectedIndex = 0; });
-            $tbody.find('select.select2').val(null).trigger('change');
-
-            // set ke 0 lalu hitung ulang
-            $('#totalQty').val(0);
-            $('#totalQtyBadge').text(0);
-            $('#totalItem').text(1);
-
-            }, 0);
-        });
-
-      // Validasi ringan saat submit
-      $('#poForm').on('submit', function (e) {
-        const supplier = $('[name="supplier"]').val();
-        const tanggal = $('[name="tanggal_po"]').val();
-        if (!supplier || !tanggal) {
-          e.preventDefault();
-          alert('Supplier dan Tanggal PO wajib diisi.');
-          return false;
-        }
-        // Pastikan ada minimal 1 baris qty > 0
-        let hasQty = false;
-        $('.qty-order').each(function(){ if (parseFloat($(this).val()) > 0) hasQty = true; });
-        if (!hasQty) {
-          e.preventDefault();
-          alert('Minimal satu item harus memiliki Qty > 0.');
-          return false;
-        }
-      });
-
-      // Hitung awal
-      recalcTotals();
-    });
-
-    var skuData = @Html.Raw(Json.Serialize(sku));
-    function pilihSku(el) {
-        const selectedSku = $(el).val();
-        const row = $(el).closest('tr');
-
-        const data = skuData.find(x => x.idSku == selectedSku);
-        console.log(data);
-        row.find('input[name="nama_item[]"]').val(data.namaBarang);
-        row.find('input[name="unit[]"]').val(data.unitMeasureName);
-    }
-
-    function collectItems() {
-        const items = [];
-        $('#orderTable tbody tr').each(function(){
-            const row = $(this);
-            items.push({
-                itemId: row.find('.sku').val() || null,
-                itemName: row.find('.item-name').val() || '',
-                qtyOrder: parseInt(row.find('.qty-order').val() || '0', 10),
-                qtyReceived: 0,
-                unitMeasureName: row.find('.unit-name').val() || null,
-                keteranganNotes: row.find('.keterangan-item').val() || null
-            });
-        });
-        return items;
-    }
-
-    function calcTotalQty(items){
-        return items.reduce((a,b)=> a + (parseInt(b.qtyOrder||0,10)), 0);
-    }
-
-    function getCsrf() {
-        return document.querySelector('input[name="__RequestVerificationToken"]').value;
-    }
-
-    // Parse tanggal dd/MM/yyyy dari input datepicker Tuan (mis. "03/11/2025")
-    function getTanggalPo() {
-        return $('#tanggalPo').val(); // string "dd/MM/yyyy" -> converter DateOnly akan handle
-    }
-    async function savePo(isPost){
-        const dto = {
-            supplierId: $('#supplier').val() || '',
-            supplierName: $('#supplier option:selected').text() || null,
-            tanggalPo: getTanggalPo(),     // "dd/MM/yyyy"
-            statusPo: isPost ? 'Posted' : 'Draft',
-            totalQty: $('#totalQty').val(),                   // server akan hitung ulang
-            keterangan: $('#keterangan').val() || null,
-            items: collectItems(),
-            status: true
-        };
-        dto.totalQty = calcTotalQty(dto.items);
-
-        const res = await fetch(`/PurchaseOrder/Create?post=${isPost}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrf()
-            },
-            body: JSON.stringify(dto)
-        });
-
-        if (!res.ok) {
-            const err = await res.json().catch(()=> ({}));
-            showAlert(err && err.message, 'danger');
-            return;
-        }
-
-        const data = await res.json();
-        showAlert(data.message, 'success');
-        setTimeout(() => {
-            window.location.href = '/PurchaseOrder/Index';
-        }, 1200);
-    }
-
-    // Hook tombol
-    $(document).on('click', '#btnSimpanDraft', function(e){
-        e.preventDefault();
-        savePo(false);
-    });
-    $(document).on('click', '#btnSimpanPo', function(e){
-        e.preventDefault();
-        savePo(true);
-    });
-</script>

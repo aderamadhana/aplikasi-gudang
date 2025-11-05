@@ -83,6 +83,7 @@ namespace gudang_net_baru.Controllers
                 {
                     HttpContext.Session.SetString("UserRole", roles.First());
                     HttpContext.Session.SetString("UserId", user.Id);
+                    HttpContext.Session.SetString("UserName", user.FirstName + ' ' + user.LastName);
                     HttpContext.Session.SetString("Menu", JsonSerializer.Serialize(menu));
                 }
 

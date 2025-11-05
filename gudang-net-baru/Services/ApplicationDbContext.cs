@@ -30,5 +30,7 @@ namespace gudang_net_baru.Services
         public DbSet<UnitMeasureEntity> MasterUnitMeasure { get; set; }
         public DbSet<PurchaseOrderEntity> PurchaseOrder { get; set; }        
         public DbSet<PurchaseOrderDetailEntity> PurchaseOrderDetail { get; set; }
+        public DbSet<GoodReceiveEntity> GoodReceive { get; set; }
+        public DbSet<GoodReceiveDetailEntity> GoodReceiveDetail { get; set; }
     }
 }

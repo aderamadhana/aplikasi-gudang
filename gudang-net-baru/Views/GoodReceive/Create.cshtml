@@ -1,12 +1,16 @@
 ﻿@{
     ViewData["Title"] = "Tambah Purchase Order";
+    var purchase_order = ViewBag.PurchaseOrder;
+    var lokasi_stagging = ViewBag.LokasiStagging;
+    var username = ViewBag.UserName;
+    var user_id = ViewBag.UserId;
 }
 
 <!-- Header -->
 <div class="page-header d-flex align-items-center justify-content-between">
     <div>
-        <h2 class="h4 mb-0">Form Purchase Order</h2>
-        <small class="opacity-75">Buat PO baru untuk pembelian barang</small>
+        <h2 class="h4 mb-0">Form Goods Receive</h2>
+        <small class="opacity-75">Menerima barang berdasarkan PO dan mencatat hasil penerimaan</small>
     </div>
 </div>
 
@@ -21,30 +25,34 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label required">PO Number</label>
-                    <select class="form-select" name="supplier" required>
+                    <select class="form-select select2" required id="po_number">
                         <option value="" selected disabled>Pilih PO Number</option>
-                        <option value="#333444">#333444</option>
-                        <option value="#333555">#333555</option>
+                        @foreach(var items in purchase_order)
+                        {
+                            <option value="@items.PurchaseOrderId">@items.PoNumber</option>
+                        }
                     </select>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label required">Supplier</label>
-                    <input type="text" class="form-control" name="tanggal_po" required>
+                    <input type="text" class="form-control" id="nama_supplier" name="nama_supplier" required readonly>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label required">Tanggal Terima</label>
-                    <input type="date" class="form-control" name="tanggal_po" required>
+                    <input type="date" class="form-control" id="tanggal_receive" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label required">User</label>
-                    <input type="text" class="form-control" name="tanggal_po" required>
+                    <input type="text" class="form-control" id="user_id" required value="@username" readonly>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label required">Lokasi Stagging</label>
-                    <select class="form-select" name="supplier" required>
+                    <select class="form-select select2" id="lokasi_stagging" required>
                         <option value="" selected disabled>Pilih Lokasi Staging</option>
-                        <option value="Staging A">Staging A</option>
-                        <option value="Staging B">Staging B</option>
+                        @foreach (var items in lokasi_stagging)
+                        {
+                            <option value="@items.IdLokasi">@items.Warehouse - @items.TipeLokasi</option>
+                        }
                     </select>
                 </div>
             </div>
@@ -55,51 +63,24 @@
     <div class="card card-modern mb-3">
         <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="mb-0"><i class="bi bi-bag-check"></i> Form Detail Pengiriman</h5>
-            <div class="floating-add">
-                <button type="button" class="btn btn-success btn-sm" id="addRowBtn">
-                    <i class="bi bi-plus-lg me-1"></i> Tambah Item
-                </button>
-            </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table id="orderTable" class="table table-bordered align-middle">
                     <thead>
                         <tr>
-                            <th style="width:12%">SKU</th>
                             <th>Nama Item</th>
-                            <th style="width:14%">Qty Order</th>
-                            <th style="width:14%">Qty Received</th>
-                            <th style="width:12%">Lot No</th>
-                            <th style="width:12%">Expiry</th>
+                            <th style="width:8%">Qty Order</th>
+                            <th>Qty Received</th>
+                            <th style="width:8%">Unit</th>
+                            <th>Lot No</th>
+                            <th>Expiry</th>
                             <th>Status QC</th>
-                            <th style="width:48px"></th>
                         </tr>
                     </thead>
                     <tbody class="input-tight">
-                        <tr>
-                            <td><input type="text" class="form-control" name="sku[]" placeholder="SKU"></td>
-                            <td><input type="text" class="form-control" name="nama_item[]" placeholder="Nama item"></td>
-                            <td>
-                                <input type="number" class="form-control" name="qty_order[]" min="0" step="1" placeholder="0">
-                            </td>
-                            <td>
-                                <input type="number" class="form-control qty-input" name="qty_received[]" min="0" step="1" placeholder="0">
-                            </td>
-                            <td><input type="text" class="form-control" name="lot_no[]" placeholder="Lot No"></td>
-                            <td><input type="date" class="form-control" name="expiry[]" placeholder="Expiry"></td>
-                            <td>
-                                <select class="form-select" name="unit[]">
-                                    <option value="ok">ok</option>
-                                    <option value="hold">hold</option>
-                                    <option value="reject">reject</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <button type="button" class="btn btn-outline-danger btn-sm removeRowBtn" title="Hapus baris">
-                                    <i class="bi bi-trash3"></i>
-                                </button>
-                            </td>
+                        <tr class="text-center">
+                            <td colspan="7">Pilih PO Number Terlebih Dahulu!</td>
                         </tr>
                     </tbody>
                 </table>
@@ -116,11 +97,11 @@
                     <button type="reset" class="btn btn-light border">
                         <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
                     </button>
-                    <button type="submit" class="btn btn-warning">
+                    <button id="btnSimpanDraft" class="btn btn-warning">
                         <i class="bi bi-save2 me-1"></i> Simpan Draft
                     </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save2 me-1"></i> Simpan PO
+                    <button id="btnSimpanGr" class="btn btn-primary">
+                        <i class="bi bi-save2 me-1"></i> Simpan Goods Receive
                     </button>
                 </div>
             </div>
@@ -129,36 +110,6 @@
 </form>
 
 <script>
-    // Tambah baris item
-    function newRowTemplate() {
-      return `
-        <tr>
-            <td><input type="text" class="form-control" name="sku[]" placeholder="SKU"></td>
-            <td><input type="text" class="form-control" name="nama_item[]" placeholder="Nama item"></td>
-            <td>
-                <input type="number" class="form-control qty-input" name="qty_order[]" min="0" step="1" placeholder="0">
-            </td>
-            <td>
-                <input type="number" class="form-control qty-input" name="qty_received[]" min="0" step="1" placeholder="0">
-            </td>
-            <td><input type="text" class="form-control" name="lot_no[]" placeholder="Lot No"></td>
-            <td><input type="date" class="form-control" name="expiry[]" placeholder="Expiry"></td>
-            <td>
-                <select class="form-select" name="unit[]">
-                    <option value="ok">ok</option>
-                    <option value="hold">hold</option>
-                    <option value="reject">reject</option>
-                </select>
-            </td>
-            <td class="text-center">
-                <button type="button" class="btn btn-outline-danger btn-sm removeRowBtn" title="Hapus baris">
-                    <i class="bi bi-trash3"></i>
-                </button>
-            </td>
-        </tr>
-      `;
-    }
-
     function recalcTotals() {
       let totalQty = 0;
       $('.qty-input').each(function() {
@@ -173,16 +124,48 @@
     }
 
     $(document).ready(function () {
-      // Tambah baris
-      $('#addRowBtn').on('click', function () {
-        $('#orderTable tbody').append(newRowTemplate());
-        recalcTotals();
-      });
+      var poData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(purchase_order));
 
-      // Hapus baris (event delegation)
-      $('#orderTable').on('click', '.removeRowBtn', function () {
-        $(this).closest('tr').remove();
-        recalcTotals();
+      $("#po_number").on("change", function(){
+            const selectedPo = $(this).val();
+            let data = poData.find(x => x.PurchaseOrderId === selectedPo);
+            
+            if (!data) return;
+            $('#nama_supplier').val(data.SupplierName);
+
+
+            // kosongkan semua baris dulu
+            $(".input-tight").empty();
+
+            // looping detail PO
+            data.Details.forEach(d => {
+                let row = `
+                <tr>
+                    <td>
+                        ${d.ItemName}
+                        <input type="hidden" class="item-id" name="item_id[]" value="${d.ItemId}">
+                        <input type="hidden" class="item-name" name="item_name[]" value="${d.ItemName}">
+                        <input type="hidden" class="qty-order" name="qty_order[]" value="${d.QtyOrder}">
+                    </td>
+                    <td class="text-center">${d.QtyOrder}</td>
+                    <td><input type="number" class="form-control qty-input" name="qty_received[]" min="0" step="1" max="${d.QtyOrder}"></td>
+                    <td class="text-center">${d.UnitMeasureName}</td>
+                    <td><input type="text" class="form-control lot-no" name="lot_no[]"></td>
+                    <td><input type="date" class="form-control expiry" name="expiry[]"></td>
+                    <td>
+                        <select class="form-select status-qc" name="status_qc[]">
+                            <option value="ok">ok</option>
+                            <option value="hold">hold</option>
+                            <option value="reject">reject</option>
+                        </select>
+                    </td>
+                </tr>`;
+
+                $(".input-tight").append(row);
+            });
+
+            // Reinit Select2 setelah append baris
+            $(".select2").select2();
       });
 
       // Recalc saat qty berubah
@@ -193,34 +176,114 @@
         // beri jeda agar input ter-reset dulu
         setTimeout(function () {
           // sisakan 1 baris
-          const $tbody = $('#orderTable tbody');
-          $tbody.find('tr:gt(0)').remove();
-          $tbody.find('input').val('');
-          $tbody.find('select').each(function(){ this.selectedIndex = 0; });
-          recalcTotals();
-        }, 0);
-      });
+            const $tbody = $('#orderTable tbody');
+            $tbody.find('tr:gt(0)').remove();
+            $tbody.find('input').val('');
+            $tbody.find('select').each(function(){ this.selectedIndex = 0; });
 
-      // Validasi ringan saat submit
-      $('#poForm').on('submit', function (e) {
-        const supplier = $('[name="supplier"]').val();
-        const tanggal = $('[name="tanggal_po"]').val();
-        if (!supplier || !tanggal) {
-          e.preventDefault();
-          alert('Supplier dan Tanggal PO wajib diisi.');
-          return false;
-        }
-        // Pastikan ada minimal 1 baris qty > 0
-        let hasQty = false;
-        $('.qty-input').each(function(){ if (parseFloat($(this).val()) > 0) hasQty = true; });
-        if (!hasQty) {
-          e.preventDefault();
-          alert('Minimal satu item harus memiliki Qty > 0.');
-          return false;
-        }
+            // ✅ Reset select2 PO Number
+            $('#po_number').val('').trigger('change');
+
+            // ✅ Reset Lokasi Staging select2
+            $('#lokasi_stagging').val('').trigger('change');
+
+            // ✅ Reset field supplier & tanggal
+            $('#nama_supplier').val('');
+            $('#tanggal_po').val('');
+
+            const defaultRow = `
+                <tr class="text-center">
+                    <td colspan="7">Pilih PO Number Terlebih Dahulu!</td>
+                </tr>
+            `;
+            $('.input-tight').html(defaultRow);
+
+            if (typeof recalcTotals === 'function') {
+                recalcTotals();
+            }
+        }, 0);
       });
 
       // Hitung awal
       recalcTotals();
     });
+
+    $(document).on('input', '.qty-input', function () {
+        let max = parseInt($(this).attr('max')) || 0;
+        let val = parseInt($(this).val()) || 0;
+
+        if (val > max) {
+            showAlert(`Qty Received tidak boleh lebih dari ${max}`, 'warning');
+            $(this).val('');
+            recalcTotals();
+
+        }
+    });
+
+    // Hook tombol
+    $(document).on('click', '#btnSimpanDraft', function(e){
+        e.preventDefault();
+        saveGr(false);
+    });
+    $(document).on('click', '#btnSimpanGr', function(e){
+        e.preventDefault();
+        saveGr(true);
+    });
+
+    async function saveGr(isPost){
+        const dto = {
+            poId: $('#po_number').val() || '',
+            poNo: $('#po_number option:selected').text() || null,
+            tanggalTerima: $('#tanggal_receive').val(),     // "dd/MM/yyyy"
+            statusGr: isPost ? 'Posted' : 'Draft',
+            lokasiId: $('#lokasi_stagging').val(),
+            lokasiName: $('#lokasi_stagging option:selected').text() || null,
+            items: collectItems(),
+            status: true
+        };
+        // dto.totalQty = calcTotalQty(dto.items);
+
+        const res = await fetch(`/GoodReceive/Create?post=${isPost}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': getCsrf()
+            },
+            body: JSON.stringify(dto)
+        });
+
+        if (!res.ok) {
+            const err = await res.json().catch(()=> ({}));
+            showAlert(err && err.message, 'danger');
+            return;
+        }
+
+        const data = await res.json();
+        showAlert(data.message, 'success');
+        setTimeout(() => {
+            window.location.href = '/GoodReceive/Index';
+        }, 1200);
+    }
+    
+    function getCsrf() {
+        return document.querySelector('input[name="__RequestVerificationToken"]').value;
+    }
+
+    function collectItems() {
+        const items = [];
+        $('#orderTable tbody tr').each(function(){
+            const row = $(this);
+            items.push({
+                itemId: row.find('.item-id').val() || null,
+                itemName: row.find('.item-name').val() || '',
+                qtyOrder: parseInt(row.find('.qty-order').val() || '0', 10),
+                qtyReceived: parseInt(row.find('.qty-input').val() || '0', 10),
+                lotNo: row.find('.lot-no').val() || null,
+                expiry: row.find('.expiry').val() || null,
+                statusQc: row.find('.status-qc').val() || null
+            });
+        });
+        return items;
+    }
+
 </script>

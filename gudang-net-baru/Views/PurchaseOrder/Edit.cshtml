@@ -3,6 +3,7 @@
     ViewData["Title"] = "Edit Purchase Order";
     var supplier = ViewBag.ListSupplier;
     var sku = ViewBag.ListSku;
+    var id = ViewBag.Id;
 }
 
 <!-- Header -->
@@ -12,7 +13,6 @@
         <small class="opacity-75">Buat PO baru untuk pembelian barang</small>
     </div>
 </div>
-
 <form method="post" enctype="multipart/form-data" id="poForm">
 
     <!-- DETAIL -->
@@ -28,25 +28,25 @@
                         <option value="" selected disabled>Pilih Supplier</option>
                         @foreach (var supp in supplier)
                         {
-                            <option value="@supp.IdSupplier">@supp.NamaSupplier</option>
+                            <option value="@supp.IdSupplier" selected="@(Model?.SupplierId == supp.IdSupplier)">@supp.NamaSupplier</option>
                         }
                     </select>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label required">Tanggal PO</label>
-                    <input type="date" id="tanggalPo" class="form-control" required>
+                    <input type="date" id="tanggalPo" class="form-control" value="@(Model?.TanggalPo.ToString("yyyy-MM-dd"))" required>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label required">Total Qty</label>
                     <div class="input-group">
-                        <input type="number" class="form-control" id="totalQty" readonly placeholder="0">
+                        <input type="number" class="form-control" id="totalQty" value="@Model?.TotalQty" readonly placeholder="0">
                         <span class="input-group-text">pcs</span>
                     </div>
                     <div class="form-text">Otomatis dihitung dari Items.</div>
                 </div>
                 <div class="col-12">
                     <label class="form-label">Keterangan</label>
-                    <textarea class="form-control" id="keterangan" rows="2" placeholder="Catatan tambahan (opsional)"></textarea>
+                    <textarea class="form-control" id="keterangan" rows="2" placeholder="Catatan tambahan (opsional)">@Model?.Keterangan</textarea>
                 </div>
             </div>
         </div>
@@ -112,9 +112,6 @@
                     <span class="summary-pill">Total Qty: <span id="totalQtyBadge">0</span></span>
                 </div>
                 <div class="form-actions">
-                    <button type="reset" class="btn btn-light border">
-                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
-                    </button>
                     <button id="btnSimpanDraft" type="button" class="btn btn-warning">
                         <i class="bi bi-save2 me-1"></i> Simpan Draft
                     </button>
@@ -128,6 +125,47 @@
 </form>
 
 <script>
+    var initialPo = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model ?? new gudang_net_baru.Models.Transaction.PurchaseOrder.PurchaseOrderDto()));
+    
+    function rowFromData(it) {
+      const $row = $(newRowTemplate());
+      // set nilai
+      $row.find('.sku').val(it.ItemId).trigger('change'); // select2 akan set KodeSku
+      $row.find('.item-name').val(it.ItemName || '');
+      $row.find('.qty-order').val(it.QtyOrder || 0);
+      $row.find('.unit-name').val(it.UnitMeasureName || '');
+      $row.find('.keterangan-item').val(it.KeteranganNotes || '');
+      return $row;
+    }
+
+    function hydrateFromModel(po) {
+      if (!po) return;
+
+      // Supplier (kalau opsi belum selected via Razor)
+      if (po.supplierId) {
+        $('#supplier').val(po.supplierId).trigger('change');
+      }
+
+      // Tanggal (sudah diisi dari Razor value="yyyy-MM-dd"), ini opsional
+      // if (po.tanggalPo) $('#tanggalPo').val(po.tanggalPo.substring(0,10));
+
+      // Keterangan
+      if (po.keterangan) $('#keterangan').val(po.keterangan);
+
+      // Items
+      const $tbody = $('#orderTable tbody');
+      $tbody.empty();
+      if (po.Items && po.Items.length) {
+        po.Items.forEach(it => {
+          const $row = rowFromData(it);
+          $tbody.append($row);
+        });
+      } 
+
+      // refresh select2 untuk baris baru
+      $('.select2').select2();
+      recalcTotals();
+    }
     // Tambah baris item
     function newRowTemplate() {
       return `
@@ -178,6 +216,7 @@
 
     $(document).ready(function () {
       // Tambah baris
+      hydrateFromModel(initialPo);
       $('#addRowBtn').on('click', function () {
         $('#orderTable tbody').append(newRowTemplate());
         $('.select2').select2();
@@ -194,45 +233,26 @@
       $('#orderTable').on('input', '.qty-order', recalcTotals);
 
       // Reset form
-        $('#poForm').on('reset', function () {
-            setTimeout(function () {
-            const $tbody = $('#orderTable tbody');
+      $('#poForm').on('reset', function () {
+        setTimeout(function () {
+        const $tbody = $('#orderTable tbody');
 
-            // hapus semua baris item kecuali yang pertama yang memang baris input
-            $tbody.find('tr').filter(function(){
-                return $(this).find('.qty-order').length > 0;
-            }).slice(1).remove();
+        // hapus semua baris item kecuali yang pertama yang memang baris input
+        $tbody.find('tr').filter(function(){
+            return $(this).find('.qty-order').length > 0;
+        }).slice(1).remove();
 
-            // kosongkan field di baris yang tersisa
-            $tbody.find('input[type="text"], input[type="number"]').val('');
-            $tbody.find('select').each(function(){ this.selectedIndex = 0; });
-            $tbody.find('select.select2').val(null).trigger('change');
+        // kosongkan field di baris yang tersisa
+        $tbody.find('tr:gt(0)').remove();
+        $tbody.find('input').val('');
+        $tbody.find('select').each(function(){ this.selectedIndex = 0; });
 
-            // set ke 0 lalu hitung ulang
-            $('#totalQty').val(0);
-            $('#totalQtyBadge').text(0);
-            $('#totalItem').text(1);
+        // set ke 0 lalu hitung ulang
+        $('#totalQty').val(0);
+        $('#totalQtyBadge').text(0);
+        $('#totalItem').text(1);
 
-            }, 0);
-        });
-
-      // Validasi ringan saat submit
-      $('#poForm').on('submit', function (e) {
-        const supplier = $('[name="supplier"]').val();
-        const tanggal = $('[name="tanggal_po"]').val();
-        if (!supplier || !tanggal) {
-          e.preventDefault();
-          alert('Supplier dan Tanggal PO wajib diisi.');
-          return false;
-        }
-        // Pastikan ada minimal 1 baris qty > 0
-        let hasQty = false;
-        $('.qty-order').each(function(){ if (parseFloat($(this).val()) > 0) hasQty = true; });
-        if (!hasQty) {
-          e.preventDefault();
-          alert('Minimal satu item harus memiliki Qty > 0.');
-          return false;
-        }
+        }, 0);
       });
 
       // Hitung awal
@@ -245,7 +265,6 @@
         const row = $(el).closest('tr');
 
         const data = skuData.find(x => x.idSku == selectedSku);
-        console.log(data);
         row.find('input[name="nama_item[]"]').val(data.namaBarang);
         row.find('input[name="unit[]"]').val(data.unitMeasureName);
     }
@@ -279,7 +298,9 @@
         return $('#tanggalPo').val(); // string "dd/MM/yyyy" -> converter DateOnly akan handle
     }
     async function savePo(isPost){
+        var poId = "@id";
         const dto = {
+            poId: "@id",
             supplierId: $('#supplier').val() || '',
             supplierName: $('#supplier option:selected').text() || null,
             tanggalPo: getTanggalPo(),     // "dd/MM/yyyy"
@@ -291,7 +312,7 @@
         };
         dto.totalQty = calcTotalQty(dto.items);
 
-        const res = await fetch(`/PurchaseOrder/Create?post=${isPost}`, {
+        const res = await fetch(`/PurchaseOrder/Edit?post=${isPost}&poId=${poId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

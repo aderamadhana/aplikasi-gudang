@@ -3,6 +3,7 @@ using gudang_net_baru.Models.Transaction.PurchaseOrder;
 using gudang_net_baru.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace gudang_net_baru.Controllers.Transaksi
@@ -171,13 +172,177 @@ namespace gudang_net_baru.Controllers.Transaksi
         {
             ViewBagLoad();
 
-            return View();
+            var purchase_order = context.PurchaseOrder
+                .Include(x => x.Details)
+                .FirstOrDefault(x => x.PurchaseOrderId == id);
+
+            if (purchase_order == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var dto = new PurchaseOrderDto
+            {
+                PoNumber = purchase_order.PoNumber,
+                SupplierId = purchase_order.SupplierId,
+                SupplierName = purchase_order.SupplierName,
+                TanggalPo = DateOnly.FromDateTime((DateTime)purchase_order.TanggalPo),
+                TotalQty = purchase_order.TotalQty,
+                Keterangan = purchase_order.Keterangan,
+                Status = purchase_order.Status,
+                StatusPo = purchase_order.StatusPo,
+                CreatedAt = purchase_order.CreatedAt,
+                CreatedBy = purchase_order.CreatedBy,
+                Items = purchase_order.Details.Select(i => new PurchaseOrderDetailDto
+                {
+                    ItemId = i.ItemId,
+                    ItemName = i.ItemName,
+                    QtyOrder = i.QtyOrder,
+                    QtyReceived = i.QtyReceived,
+                    UnitMeasureName = i.UnitMeasureName,
+                    KeteranganNotes = i.Keterangan,
+                }).ToList()
+
+            };
+
+            ViewBag.Id = id;
+
+            return View(dto);
         }
         public IActionResult Edit(string id)
         {
             ViewBagLoad();
 
-            return View();
+            var purchase_order = context.PurchaseOrder
+                .Include(x => x.Details)
+                .FirstOrDefault(x => x.PurchaseOrderId == id);
+
+            if (purchase_order == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var dto = new PurchaseOrderDto
+            {
+                PoNumber = purchase_order.PoNumber,
+                SupplierId = purchase_order.SupplierId,
+                SupplierName = purchase_order.SupplierName,
+                TanggalPo = DateOnly.FromDateTime((DateTime)purchase_order.TanggalPo),
+                TotalQty = purchase_order.TotalQty,
+                Keterangan = purchase_order.Keterangan,
+                Status = purchase_order.Status,
+                CreatedAt = purchase_order.CreatedAt,
+                CreatedBy = purchase_order.CreatedBy,
+                Items = purchase_order.Details.Select(i => new PurchaseOrderDetailDto
+                {
+                    ItemId = i.ItemId,
+                    ItemName = i.ItemName,
+                    QtyOrder = i.QtyOrder,
+                    QtyReceived = i.QtyReceived,
+                    UnitMeasureName = i.UnitMeasureName,
+                    KeteranganNotes = i.Keterangan,
+                }).ToList()
+
+            };
+
+            ViewBag.Id = id;
+
+            return View(dto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit([FromBody] PurchaseOrderDto dto, [FromQuery] string poId = "", [FromQuery] bool post = false)
+        {
+            if (dto is null)
+            {
+                ViewBagLoad();
+                return BadRequest(new
+                {
+                    error = true,
+                    message = "Harap isi semua data!"
+                });
+            }
+
+            if (dto.TotalQty == 0)
+            {
+                ViewBagLoad();
+                return BadRequest(new
+                {
+                    error = true,
+                    message = "Items Order tidak boleh kosong!"
+                });
+            }
+
+            var data_po = await context.PurchaseOrder
+                .Include(x => x.Details)
+                .FirstOrDefaultAsync(x => x.PurchaseOrderId == poId);
+
+            if(data_po == null)
+            {
+                return BadRequest(new
+                {
+                    error = true,
+                    message = "Data purchase order tidak ditemukan!"
+                });
+            }
+
+            string today = DateTime.Now.ToString("yyyyMMdd");
+
+            // ambil PO terakhir hari ini
+            var lastPo = context.PurchaseOrder
+                .Where(x => x.PoNumber.Contains(today))
+                .OrderByDescending(x => x.PoNumber)
+                .Select(x => x.PoNumber)
+                .FirstOrDefault();
+
+            // dapat urutan hari ini
+            int seq = 1;
+            if (!string.IsNullOrEmpty(lastPo))
+            {
+                var lastSeq = lastPo.Split('-').Last(); // ambil 0001
+                int.TryParse(lastSeq, out seq);
+                seq++;
+            }
+
+            string poNumber = null;
+            if (dto.StatusPo == "Posted")
+            {
+                poNumber = $"#PO-{today}-{seq.ToString("D4")}";
+            }
+
+            data_po.SupplierId = dto.SupplierId;
+            data_po.SupplierName = dto.SupplierName;
+            data_po.PoNumber = poNumber;
+            data_po.TanggalPo = dto.TanggalPo.ToDateTime(TimeOnly.MinValue);
+            data_po.StatusPo = dto.StatusPo;
+            data_po.TotalQty = dto.TotalQty;
+            data_po.UpdatedAt = DateTime.Now;
+            data_po.UpdatedBy = HttpContext.Session.GetString("UserId");
+
+
+            data_po.Details.Clear();
+            foreach (var d in dto.Items)
+            {
+                data_po.Details.Add(new PurchaseOrderDetailEntity
+                {
+                    ItemId = d.ItemId,
+                    ItemName = d.ItemName,
+                    QtyOrder = d.QtyOrder,
+                    QtyReceived = d.QtyReceived,
+                    UnitMeasureName = d.UnitMeasureName,
+                    Keterangan = d.KeteranganNotes
+                });
+            }
+
+            await context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = data_po.StatusPo == "Posted" ? "Purchase Order berhasil diposting." : "Draft berhasil disimpan.",
+                id = data_po.PurchaseOrderId,
+                statusPo = data_po.StatusPo,
+                totalQty = data_po.TotalQty
+            });
         }
 
         private void ViewBagLoad()

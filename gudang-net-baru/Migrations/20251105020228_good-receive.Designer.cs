@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using gudang_net_baru.Services;
 
@@ -11,9 +12,11 @@ using gudang_net_baru.Services;
 namespace gudang_net_baru.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251105020228_good-receive")]
+    partial class goodreceive
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -618,9 +621,6 @@ namespace gudang_net_baru.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Expiry")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("GoodReceiveEntityGrnId")
                         .HasColumnType("nvarchar(450)");
 
@@ -630,17 +630,17 @@ namespace gudang_net_baru.Migrations
                     b.Property<string>("ItemName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("LokasiStagingId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LokasiStagingName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LotNo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("QtyOrder")
-                        .HasColumnType("int");
-
                     b.Property<int?>("QtyReceived")
                         .HasColumnType("int");
-
-                    b.Property<string>("StatusQC")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("GrnDetailId");
 
@@ -670,19 +670,13 @@ namespace gudang_net_baru.Migrations
                     b.Property<string>("GrnNo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LokasiId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LokasiName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PoId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<string>("StatusGr")
+                    b.Property<string>("StatusGrn")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("TanggalTerima")
