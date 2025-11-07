@@ -1,9 +1,13 @@
-﻿@{
-    ViewData["Title"] = "Tambah Purchase Order";
+﻿@using System.Text.Json
+@{
+    ViewData["Title"] = "Edit Good Receive";
     var purchase_order = ViewBag.PurchaseOrder;
     var lokasi_stagging = ViewBag.LokasiStagging;
     var username = ViewBag.UserName;
     var user_id = ViewBag.UserId;
+    var good_receive = ViewBag.GoodReceive;
+    var good_receive_json = good_receive.Details;
+    var id = ViewBag.Id;
 }
 
 <!-- Header -->
@@ -13,7 +17,6 @@
         <small class="opacity-75">Menerima barang berdasarkan PO dan mencatat hasil penerimaan</small>
     </div>
 </div>
-
 <form method="post" enctype="multipart/form-data" id="poForm">
 
     <!-- DETAIL -->
@@ -25,25 +28,25 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label required">PO Number</label>
-                    <select class="form-select select2" required id="po_number">
+                    <select class="form-select select2 readonly-select" required id="po_number">
                         <option value="" selected disabled>Pilih PO Number</option>
-                        @foreach(var items in purchase_order)
+                        @foreach (var items in purchase_order)
                         {
-                            <option value="@items.PurchaseOrderId">@items.PoNumber</option>
+                            <option value="@items.PurchaseOrderId" selected="@(items.PurchaseOrderId == good_receive.PoId)">@items.PoNumber</option>
                         }
                     </select>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label required">Supplier</label>
-                    <input type="text" class="form-control" id="nama_supplier" name="nama_supplier" required readonly>
+                    <input type="text" class="form-control" id="nama_supplier" name="nama_supplier" value="@good_receive.SupplierName" required readonly>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label required">Tanggal Terima</label>
-                    <input type="date" class="form-control" id="tanggal_receive" required>
+                    <input type="date" class="form-control" id="tanggal_receive" value="@(good_receive.TanggalTerima.ToString("yyyy-MM-dd"))" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label required">User</label>
-                    <input type="text" class="form-control" id="user_id" required value="@username" readonly>
+                    <input type="text" class="form-control" id="user_id" value="@good_receive.FullName" required value="@username" readonly>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label required">Lokasi Stagging</label>
@@ -51,7 +54,7 @@
                         <option value="" selected disabled>Pilih Lokasi Staging</option>
                         @foreach (var items in lokasi_stagging)
                         {
-                            <option value="@items.IdLokasi">@items.Warehouse - @items.TipeLokasi</option>
+                            <option value="@items.IdLokasi" selected="@(items.IdLokasi == good_receive.LokasiId)">@items.Warehouse - @items.TipeLokasi</option>
                         }
                     </select>
                 </div>
@@ -79,9 +82,39 @@
                         </tr>
                     </thead>
                     <tbody class="input-tight">
-                        <tr class="text-center">
-                            <td colspan="7">Pilih PO Number Terlebih Dahulu!</td>
-                        </tr>
+                        @foreach (var item in good_receive_json)
+                        {
+                            <tr>
+                                <td>
+                                    <span>@item.ItemName</span>
+                                    <input type="hidden" class="item-id" name="item_id[]" value="@item.ItemId">
+                                    <input type="hidden" class="item-name" name="item_name[]" value="@item.ItemName">
+                                    <input type="hidden" class="qty-order" name="qty_order[]" value="@item.QtyOrder">
+                                </td>
+                                <td>
+                                    <span>@item.QtyOrder</span>
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control qty-input" name="qty_received[]" min="0" step="1" max="@item.QtyOrder" value="@item.QtyReceived">
+                                </td>
+                                <td>
+                                    <span>@item.UnitMeasureName</span>
+                                </td>
+                                <td>
+                                    <span>@item.LotNo</span>
+                                </td>
+                                <td>
+                                    <input type="date" class="form-control expiry" name="expiry[]" value="@(item.Expiry.ToString("yyyy-MM-dd"))">
+                                </td>
+                                <td>
+                                    <select class="form-select status-qc" name="status_qc[]">
+                                        <option value="ok" selected="@(item.StatusQC == "ok")">ok</option>
+                                        <option value="hold" selected="@(item.StatusQC == "hold")">hold</option>
+                                        <option value="reject" selected="@(item.StatusQC == "reject")">reject</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
@@ -124,13 +157,20 @@
     }
 
     $(document).ready(function () {
+        // Inisialisasi Select2
+        $('#po_number').select2();
+
+        // Jadikan Select2 readonly (user tidak bisa ganti, tapi value tetap dikirim)
+        $('#po_number').on('select2:opening select2:unselecting', function (e) {
+            e.preventDefault();
+        });
       var poData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(purchase_order));
 
       $("#po_number").on("change", function(){
             const selectedPo = $(this).val();
             let data = poData.find(x => x.PurchaseOrderId === selectedPo);
             let lot_no = generateLotNo("LOT", data.TanggalPo);
-            
+
             if (!data) return;
             $('#nama_supplier').val(data.SupplierName);
 
@@ -246,6 +286,7 @@
     });
 
     async function saveGr(isPost){
+        var grId = "@id";
         const dto = {
             poId: $('#po_number').val() || '',
             poNo: $('#po_number option:selected').text() || null,
@@ -258,7 +299,7 @@
         };
         // dto.totalQty = calcTotalQty(dto.items);
 
-        const res = await fetch(`/GoodReceive/Create?post=${isPost}`, {
+        const res = await fetch(`/GoodReceive/Edit?post=${isPost}&grId=${grId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -279,7 +320,7 @@
             window.location.href = '/GoodReceive/Index';
         }, 1200);
     }
-    
+
     function getCsrf() {
         return document.querySelector('input[name="__RequestVerificationToken"]').value;
     }

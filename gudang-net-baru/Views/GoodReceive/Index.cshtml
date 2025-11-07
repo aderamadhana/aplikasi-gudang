@@ -32,14 +32,13 @@
             <table class="table table-hover table-bordered table-striped align-middle" id="myTable" width="100%">
                 <thead class="table-primary text-center">
                     <tr>
-                        <th style="width: 10%;">No</th>
-                        <th>GRN Number</th>
+                        <th style="width: 5%;">No</th>
+                        <th>GR Number</th>
                         <th>PO Number</th>
-                        <th>Supplier</th>
-                        <th>Tanggal Terima</th>
-                        <th>User</th>
-                        <th>Status</th>
+                        <th>Nama Supplier</th>
                         <th>Lokasi Stagging</th>
+                        <th>Tanggal Terima</th>
+                        <th>Status GR</th>
                         <th style="width: 10%;">Aksi</th>
                     </tr>
                 </thead>
@@ -122,18 +121,56 @@
                   render: (data, type, row, meta) => meta.row + 1, // kasih nomor urut
                   defaultContent: ''
                 },
-                { data: 'poNumber', defaultContent: '' },
-                { data: 'supplier', defaultContent: '' },
-                { data: 'tanggalPo', defaultContent: '' },
-                { data: 'tanggalPo', defaultContent: '' },
-                { data: 'tanggalPo', defaultContent: '' },
-                { data: 'tanggalPo', defaultContent: '' },
                 {
-                  data: 'status',
+                    data: 'grnNo',
+                    defaultContent: '',
+                    render: (d, type, row) => {
+                        if(row.grnNo != null && row.grnNo != ""){
+                            return row.grnNo;
+                        }else{
+                            return "Data belum tersedia";
+                        }
+                    },
+                },
+                {
+                    data: 'poNumber',
+                    defaultContent: '',
+                    render: (d, type, row) => {
+                        if(row.poNumber != null && row.poNumber != ""){
+                            return row.poNumber;
+                        }else{
+                            return "Data belum tersedia";
+                        }
+                    },
+                },
+                {
+                    data: 'supplierName',
+                },
+                {
+                    data: 'lokasiName',
+                },
+                {
+                    data: 'tanggalTerima',
+                    defaultContent: '',
+                    render: function(data) {
+                        if (!data) return "";
+                        const d = new Date(data);
+                        const day = d.getDate().toString().padStart(2, '0');
+                        const month = (d.getMonth()+1).toString().padStart(2, '0');
+                        const year = d.getFullYear();
+                        return `${day}/${month}/${year}`;
+                    }
+                },
+                {
+                  data: 'statusGr',
                   render: (d, type, row) => {
-                    return d
-                    ? `<span class="badge bg-success" onclick="changeStatus('${row.idCustomer}', false)">ENABLE</span>`
-                    : `<span class="badge bg-danger" onclick="changeStatus('${row.idCustomer}', true)">DISABLE</span>`;
+                      if(row.statusGr == "Draft"){
+                          return `<span class="badge bg-warning">Draft</span>`;
+                      }else if(row.statusGr == "Posted"){
+                          return `<span class="badge bg-primary">Posted</span>`;
+                      }else if(row.statusGr == "Closed"){
+                          return `<span class="badge bg-success">Closed</span>`;
+                      }
                   },
                   defaultContent: '',
                   className:'text-center'
@@ -141,20 +178,26 @@
                 {
                   data: null,
                   render: (d, type, row) => {
-                      const id   = row.idCustomer ?? '';
+                      const id   = row.grnId ?? '';
                       const name = String(row.roleName ?? '').replace(/"/g, '&quot;');
 
-                      return row.status
-                          ? `<a href="/GoodReceive/Edit/${id}"
+                      if(row.statusGr == "Draft"){
+                          return `<a href="/GoodReceive/Edit/${id}"
                                class="btn btn-sm btn-primary me-2"
                                onclick="return confirmEdit(event, this)">
                               <i class="bi bi-pencil"></i> Edit
-                            </a>`
-                        : `<button class="btn btn-sm me-2 btn-danger"
+                            </a><button class="btn btn-sm me-2 btn-danger"
                                    data-id="${id}" data-name="${name}"
                                    onclick="hapusData('${id}','${name}')">
                              <i class="bi bi-trash"></i> Hapus
                            </button>`;
+                      }else{
+                          return `<a href="/GoodReceive/Detail/${id}"
+                               class="btn btn-sm btn-info me-2"
+                               onclick="return confirmEdit(event, this)">
+                              <i class="bi bi-eye"></i> Detail
+                            </a>`;
+                      };
                   },
                   orderable: false,
                   searchable: false,
@@ -289,7 +332,7 @@
         const status = $('#filtered-status').val();
 
         $.ajax({
-          url: '/PurchaseOrder/Export',
+          url: '/GoodReceive/Export',
           method: 'POST',
           contentType: 'application/json',
           data: JSON.stringify({ status }),

@@ -13,7 +13,7 @@ namespace gudang_net_baru.Models.Transaction.GoodReceive
         public string? StatusGr { get; set; }
         public string? LokasiId { get; set; }
         public string? LokasiName { get; set; }
-        public List<GoodReceiveDetailDto> Details { get; set; } = new();
+        public List<GoodReceiveDetailDto> Items { get; set; } = new();
         public bool? Status { get; set; }
         public DateTime? CreatedAt { get; set; }
         public string? CreatedBy { get; set; }
@@ -31,6 +31,6 @@ namespace gudang_net_baru.Models.Transaction.GoodReceive
         public int? QtyOrder { get; set; }
         public int? QtyReceived { get; set; }
         public string? StatusQC { get; set; }
-        public string? Expiry { get; set; }
+        public DateTime? Expiry { get; set; }
     }
 }

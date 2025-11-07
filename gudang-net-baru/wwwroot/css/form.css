@@ -98,3 +98,14 @@
 .select2-selection__arrow {
     height: 36px !important;
 }
+
+/* Style abu-abu agar terlihat seperti disabled */
+.readonly-select + .select2-container--default .select2-selection--single {
+    background-color: #e9ecef; /* abu-abu bootstrap */
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.readonly-select + .select2-container--default .select2-selection__arrow {
+    display: none; /* sembunyikan panah dropdown */
+}

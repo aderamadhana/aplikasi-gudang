@@ -46,7 +46,7 @@ namespace gudang_net_baru.Models.Transaction.PurchaseOrder
         public int? QtyOrder { get; set; }
         public int? QtyReceived { get; set; }
         public string? StatusQC { get; set; }
-        public string? Expiry { get; set; }
+        public DateTime? Expiry { get; set; }
     }
 }
 
