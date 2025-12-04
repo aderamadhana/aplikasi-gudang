@@ -46,7 +46,7 @@
                         <tr>
                             <th style="width:160px">Tanggal Terima</th>
                             <td style="width:240px">
-                                : <span>@gr?.TanggalTerima</span>
+                                : <span>@gr?.TanggalTerima.ToString("dd/MM/yyyy")</span>
                             </td>
                         </tr>
                         <tr>
@@ -84,7 +84,6 @@
             </div>
         </div>
     </div>
-
     <!-- ITEMS -->
     <div class="card card-modern mb-3">
         <div class="card-header d-flex align-items-center justify-content-between">
@@ -121,7 +120,7 @@
                                     <span>@item.LotNo</span>
                                 </td>
                                 <td>
-                                    <span>@item.Expiry</span>
+                                    <span>@item.Expiry.ToString("dd/MM/yyyy")</span>
                                 </td>
                                 <td>
                                     @if (item.StatusQC == "ok")

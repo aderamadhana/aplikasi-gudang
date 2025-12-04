@@ -212,15 +212,25 @@ namespace gudang_net_baru.Controllers.Transaksi
                 UserId = x.r.UserId,
                 UserName = x.u != null ? x.u.UserName : null,
                 FullName = x.u != null ? (x.u.FirstName + " " + x.u.LastName) : null, // jika ada
-                Details = x.r.Details.Select(d => new {
-                    d.ItemId,
-                    d.ItemName,
-                    d.QtyOrder,
-                    d.QtyReceived,
-                    d.StatusQC,
-                    d.LotNo,
-                    d.Expiry
-                }).ToList()
+                Details = x.r.Details
+                    .Join(
+                    context.MasterSku,                  // tabel/unit measure
+                    d => d.ItemId,                        // dari detail (GoodReceiveDetail)
+                    sk => sk.IdSku,               // dari UnitMeasure
+                    (d, sk) => new
+                    {
+                        d.ItemId,
+                        d.ItemName,
+                        d.QtyOrder,
+                        d.QtyReceived,
+                        d.StatusQC,
+                        d.LotNo,
+                        d.Expiry,
+                        UnitMeasureId = sk.UnitMeasureId,
+                        UnitMeasureName = sk.UnitMeasureName     // sesuaikan nama kolom
+                    }
+                )
+                .ToList()
             })
             .FirstOrDefault();
 
@@ -364,6 +374,15 @@ namespace gudang_net_baru.Controllers.Transaksi
             }
 
             await context.SaveChangesAsync();
+
+            if (dto.StatusGr == "Posted")
+            {
+                var data_po = context.PurchaseOrder
+                .Find(dto.PoId);
+
+                data_po.StatusPo = "Closed";
+                context.SaveChanges();
+            }
 
             return Ok(new
             {

@@ -8,6 +8,7 @@ using gudang_net_baru.Models.Master.Sku;
 using gudang_net_baru.Models.Master.Supplier;
 using gudang_net_baru.Models.Master.UnitMeasure;
 using gudang_net_baru.Models.Transaction.PurchaseOrder;
+using gudang_net_baru.Models.Transaction.PutawayTask;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,5 +33,7 @@ namespace gudang_net_baru.Services
         public DbSet<PurchaseOrderDetailEntity> PurchaseOrderDetail { get; set; }
         public DbSet<GoodReceiveEntity> GoodReceive { get; set; }
         public DbSet<GoodReceiveDetailEntity> GoodReceiveDetail { get; set; }
+        public DbSet<PutawayTaskEntity> PutawayTask { get; set; }
+        public DbSet<PutawayTaskDetailEntity> PutawayTaskDetail { get; set; }
     }
 }
